@@ -59,12 +59,6 @@ export default function SignIn() {
           Zaloguj się
         </Typography>
         {!isSubmitionCompleted && <React.Fragment>
-
-
- 
-
-
-
                 <Formik
           initialValues={{ email: "", password: "" }}
           onSubmit={(values, {setSubmitting, resetForm}) =>{
@@ -137,7 +131,7 @@ export default function SignIn() {
                   error={errors.password && touched.password}
                 />
                 <FormControlLabel
-                  control={<Checkbox value="remember" color="primary" />}
+                  control={<Checkbox value="remember" color="primary" onChange={e=> console.log(e.currentTarget.value)}/>}
                   label="Zapamiętaj mnie"
                 />
                 <Button
