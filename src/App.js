@@ -4,10 +4,12 @@ import Contact from "./components/example";
 import Dashboard from "./components/Dashboard";
 import { useDispatch, useSelector } from "react-redux";
 import { auth } from "./config";
+import AddBook from './components/AddBook'
 
 function App() {
   const dispatch = useDispatch();
   const loggedUser = useSelector(state => state.userReducer.uid);
+
 
   auth.onAuthStateChanged(user => {
     if (user) {
@@ -22,6 +24,8 @@ function App() {
     return (
       <div className="App">
         <Dashboard></Dashboard>
+        <AddBook/>
+
       </div>
     );
   } else {

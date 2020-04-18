@@ -8,12 +8,15 @@ import logger from "redux-logger"
 //Reducers
 
 import {
-  userReducer
+  userReducer, drawerOpen, openAddModal
 } from "./reducers"
 
 //combineReducers
 const reducers = combineReducers({
   userReducer: userReducer,
+  drawerOpen: drawerOpen,
+  openAddModal: openAddModal
+
 })
 
 //store

@@ -24,6 +24,10 @@ import Orders from "./Orders";
 import Copyright from "./Copyright";
 import EnhancedTable from "./EnhancedTable";
 import ProfileCard from "./ProfileCard";
+import InputBase from '@material-ui/core/InputBase';
+import SearchIcon from '@material-ui/icons/Search';
+import { fade} from '@material-ui/core/styles';
+import {useDispatch} from 'react-redux'
 
 const drawerWidth = 240;
 
@@ -103,19 +107,69 @@ const useStyles = makeStyles(theme => ({
   },
   fixedHeight: {
     height: 240
-  }
+  },
+  search: {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: fade(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: fade(theme.palette.common.white, 0.25),
+    },
+    marginLeft: 0,
+    flexGrow:1,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing(1),
+      width: 'auto',
+    },
+  },
+  searchIcon: {
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputRoot: {
+    color: 'inherit',
+  },
+  inputInput: {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      width: '22ch',
+      '&:focus': {
+        width: '50ch',
+      },
+    },
+  },
 }));
 
 export default function Dashboard() {
   const classes = useStyles();
+  const dispatch = useDispatch()
   const [open, setOpen] = useState(true);
   const [profileWasClicked, setProfileWasClicked] = useState(false);
 
   const handleDrawerOpen = () => {
     setOpen(true);
+    dispatch({
+      type: "DRAWER_OPEN",
+      open: true
+    })
+
   };
   const handleDrawerClose = () => {
     setOpen(false);
+    dispatch({
+      type: "DRAWER_OPEN",
+      open:false
+    })
   };
   const handleProfileClick = () => {
     setProfileWasClicked(!profileWasClicked);
@@ -155,6 +209,19 @@ export default function Dashboard() {
           >
             Roguz Library
           </Typography>
+          <div className={classes.search}>
+            <div className={classes.searchIcon}>
+              <SearchIcon />
+            </div>
+            <InputBase
+              placeholder="Wyszukaj…"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput,
+              }}
+              inputProps={{ 'aria-label': 'search' }}
+            />
+          </div>
           <IconButton color="inherit" onClick={handleProfileClick} >
             <AccountCircleIcon/>
           </IconButton>
@@ -178,7 +245,7 @@ export default function Dashboard() {
           </IconButton>
         </div>
         <Divider />
-        <List>{mainListItems}</List>
+        <List open={open}>{mainListItems}</List>
         <Divider />
         <List>{secondaryListItems}</List>
       </Drawer>
