@@ -6,6 +6,7 @@ import Fade from "@material-ui/core/Fade";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography"
 import { useSelector, useDispatch } from "react-redux";
+import AddBookForm from "./AddBookForm";
 
 const useStyles = makeStyles(theme => ({
   modal: {
@@ -18,14 +19,14 @@ const useStyles = makeStyles(theme => ({
     flexWrap: "wrap",
     outline:"none",
     "& > *": {
-      margin: theme.spacing(1),
-      width: theme.spacing(90),
-      height: theme.spacing(50)
+      // margin: theme.spacing(1),
+      // width: theme.spacing(100),
+      // height: theme.spacing(100)
     }
   }
 }));
 
-export default function AddBook() {
+export default function AddBookModal() {
   const classes = useStyles();
   const openAddModal = useSelector(state => state.openAddModal);
   const dispatch = useDispatch();
@@ -48,7 +49,7 @@ export default function AddBook() {
         className={classes.modal}
         open={openAddModal}
         onClose={handleClose}
-        closeAfterTransition
+         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500
@@ -57,9 +58,7 @@ export default function AddBook() {
         <Fade in={openAddModal}>
           <div className={classes.root}>
             <Paper elevation={3} >
-        <Typography>
-            TEST test test
-        </Typography>
+        <AddBookForm/>
 
             </Paper>   
           </div>

@@ -4,7 +4,7 @@ import Contact from "./components/example";
 import Dashboard from "./components/Dashboard";
 import { useDispatch, useSelector } from "react-redux";
 import { auth } from "./config";
-import AddBook from './components/AddBook'
+import AddBookModal from './components/AddBookModal'
 
 function App() {
   const dispatch = useDispatch();
@@ -24,7 +24,7 @@ function App() {
     return (
       <div className="App">
         <Dashboard></Dashboard>
-        <AddBook/>
+        <AddBookModal/>
 
       </div>
     );
