@@ -30,7 +30,9 @@ export default function AddBookModal() {
   const classes = useStyles();
   const openAddModal = useSelector(state => state.openAddModal);
   const dispatch = useDispatch();
-
+  const handleCloseButton = () => {
+    handleClose()
+  }
   const handleClose = () => {
     dispatch({
       type: "OPEN_ADD_MODAL",
@@ -54,6 +56,7 @@ export default function AddBookModal() {
         BackdropProps={{
           timeout: 500
         }}
+     
       >
         <Fade in={openAddModal}>
           <div className={classes.root}>

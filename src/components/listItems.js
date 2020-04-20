@@ -31,10 +31,9 @@ export default function FloatingActionButton(props) {
     dispatch({
       type: 'OPEN_ADD_MODAL',
       open: true
-    })
-    
+    })  
   }
-  
+
 
 
 
