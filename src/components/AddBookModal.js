@@ -29,29 +29,17 @@ const useStyles = makeStyles(theme => ({
 export default function AddBookModal() {
   const classes = useStyles();
   const openAddModal = useSelector(state => state.openAddModal);
-  const dispatch = useDispatch();
-  const handleCloseButton = () => {
-    handleClose()
-  }
-  const handleClose = () => {
-    dispatch({
-      type: "OPEN_ADD_MODAL",
-      open: false
-    });
-  };
+
 
   return (
     <div>
-      {/* <button type="button" onClick={handleOpen}>
-        react-transition-group
-      </button> */}
+
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         className={classes.modal}
         open={openAddModal}
-        onClose={handleClose}
-         closeAfterTransition
+        closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500

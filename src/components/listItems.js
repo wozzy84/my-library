@@ -13,10 +13,20 @@ import Fab from "@material-ui/core/Fab";
 import AddIcon from "@material-ui/icons/Add";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector, useDispatch } from "react-redux";
+import { withWidth } from "@material-ui/core";
+import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
-  margin: {
-    margin: theme.spacing(1)
+  
+  margin:  {
+    margin: theme.spacing(2)
+  },
+  
+  smallIcon: {
+    maxWidth: '35px', maxHeight: '35px', minWidth: '35px', minHeight: '35px',
+    margin: theme.spacing(1),
+    marginLeft: theme.spacing(1.3)
+   
   },
   extendedIcon: {
     marginRight: theme.spacing(1)
@@ -44,15 +54,15 @@ export default function FloatingActionButton(props) {
           variant="extended"
           color="primary"
           aria-label="add"
-          className={classes.margin}
           onClick={handleOpenAddModal}
-        >
+          className={classes.margin}
+        > 
           <AddIcon className={classes.extendedIcon} />
           Dodaj
         </Fab>
       ) : (
-        <Fab color="primary" aria-label="add" className={classes.margin} onClick={handleOpenAddModal}> 
-          <AddIcon />
+        <Fab color="primary" aria-label="add" className={classes.smallIcon} onClick={handleOpenAddModal}> 
+          <AddIcon/>
         </Fab>
       )}
     </div>

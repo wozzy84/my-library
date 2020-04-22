@@ -10,13 +10,14 @@ import Select from "@material-ui/core/Select";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
-import CancelIcon from '@material-ui/icons/Cancel';
+import CancelIcon from "@material-ui/icons/Cancel";
 import { Formik } from "formik";
 import { DatePicker } from "@material-ui/pickers";
 import * as Yup from "yup";
-import { IconButton } from '@material-ui/core';
-import  {db} from "../config"
-
+import { IconButton } from "@material-ui/core";
+import Alert from '@material-ui/lab/Alert';
+import { db } from "../config";
+import { useDispatch } from "react-redux";
 
 export default function AddBookForm(props) {
   const useStyles = makeStyles(theme => ({
@@ -56,10 +57,24 @@ export default function AddBookForm(props) {
     },
     selectEmpty: {
       marginTop: theme.spacing(2)
+    },
+    close: {
+      marginTop: -15,
+      marginRight: -15
     }
   }));
 
+
+  const [success, setSuccess] = useState(false)
+  const [failed, setFailed] = useState(false)
+  const dispatch = useDispatch();
   const classes = useStyles();
+  const handleClick = () => {
+    dispatch({
+      type: "OPEN_ADD_MODAL",
+      open: false
+    });
+  };
 
   return (
     <Formik
@@ -72,44 +87,65 @@ export default function AddBookForm(props) {
         library: "",
         format: ""
       }}
-      onSubmit={(values, {resetForm, setSubmitting}) => {
-        console.log(values);
-        setSubmitting(true)
-
-        db.collection('books').add({
-          title: values.title,
-          author: values.author,
-          publisher: values.publisher,
-          date: values.date,
-          owner: values.owner,
-          library: values.library,
-          format: values.format
-      })
-      .then(function() {
-        console.log("Document successfully written!");
-        resetForm()
-        setSubmitting(false)
-    })
-    .catch(function(error) {
-        console.error("Error writing document: ", error);
-        setSubmitting(false)
-    });
+      onSubmit={(values, { resetForm, setSubmitting,  }) => {
+        if (values.format==="ebook") {
+         const payload = {...values, library:"ebook" }
+          db.collection("books")
+          .add({
+            title: payload.title,
+            author: payload.author,
+            publisher: payload.publisher,
+            date: payload.date,
+            owner: payload.owner,
+            library: payload.library,
+            format: payload.format
+          })
+          .then(function() {
+            console.log("Document successfully written!");
+            resetForm();
+            setSubmitting(false);
+            setSuccess(true)
+          })
+          .catch(function(error) {
+            console.error("Error writing document: ", error);
+            setSubmitting(false);
+            setFailed(true)
+          });
+        } else {
+          db.collection("books")
+          .add({
+            title: values.title,
+            author: values.author,
+            publisher: values.publisher,
+            date: values.date,
+            owner: values.owner,
+            library: values.library,
+            format: values.format
+          })
+          .then(function() {
+            console.log("Document successfully written!");
+            resetForm();
+            setSubmitting(false);
+            setSuccess(true)
+          })
+          .catch(function(error) {
+            console.error("Error writing document: ", error);
+            setSubmitting(false);
+            setFailed(true)
+          });
+          setSubmitting(false)
+        }
+        
       }}
-
       validationSchema={Yup.object().shape({
-          title: Yup.string()
-          .required("To pole jest wymagane"),
-          author: Yup.string()
-          .required("To pole jest wymagane"),
-          owner: Yup.string()
-          .required("To pole jest wymagane"),
-           library: Yup.string().when("format", {
-             is: (format)=>format!=="ebook",
-             then: Yup.string().required("To pole jest wymagane")
-           }),
-          format: Yup.string()
-          .required("To pole jest wymagane"),
-       
+        title: Yup.string().required("To pole jest wymagane"),
+        author: Yup.string().required("To pole jest wymagane"),
+        owner: Yup.string().required("To pole jest wymagane"),
+        library: Yup.string().when("format", {
+          is: format => format !== "ebook",
+          then: Yup.string().required("To pole jest wymagane")
+        }),
+        format: Yup.string().required("To pole jest wymagane")
       })}
     >
       {props => {
@@ -122,8 +158,7 @@ export default function AddBookForm(props) {
           handleChange,
           handleBlur,
           handleSubmit,
-          setFieldValue,
-      
+          setFieldValue
         } = props;
 
         return (
@@ -132,19 +167,17 @@ export default function AddBookForm(props) {
               <React.Fragment>
                 <Grid container>
                   <Grid item xs={9}>
-
-                  <Typography variant="h6" gutterBottom>
-                  Dodaj książkę
-                </Typography>
+                    <Typography variant="h6" gutterBottom>
+                      Dodaj książkę
+                    </Typography>
                   </Grid>
                   <Grid item xs={3} align="right">
-                  <IconButton><CancelIcon></CancelIcon></IconButton>
-              
-              </Grid>
+                    <IconButton onClick={handleClick} className={classes.close}>
+                      <CancelIcon></CancelIcon>
+                    </IconButton>
                   </Grid>
-          
-             
-               
+                </Grid>
+
                 <Grid container spacing={3}>
                   <Grid item xs={12}>
                     <TextField
@@ -156,20 +189,21 @@ export default function AddBookForm(props) {
                       label="Tutuł"
                       onBlur={handleBlur}
                       fullWidth
-                      helperText={(errors.title && touched.title)&&errors.title}
+                      helperText={errors.title && touched.title && errors.title}
                       error={errors.title && touched.title}
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
-  
                       value={values.author}
                       onChange={handleChange}
                       id="add-author"
                       name="author"
                       label="Autor"
                       fullWidth
-                      helperText={(errors.author && touched.author)&&errors.author}
+                      helperText={
+                        errors.author && touched.author && errors.author
+                      }
                       error={errors.author && touched.author}
                     />
                   </Grid>
@@ -194,52 +228,48 @@ export default function AddBookForm(props) {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                
                       value={values.owner}
                       onChange={handleChange}
                       id="add-owner"
                       name="owner"
                       label="Właściciel"
                       fullWidth
-                      helperText={(errors.owner && touched.owner)&&errors.owner}
+                      helperText={errors.owner && touched.owner && errors.owner}
                       error={errors.owner && touched.owner}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    {values.format !== "ebook"  &&
+                    {values.format !== "ebook" && (
                       <FormControl
-                      required
-                      className={classes.formControl}
-                      fullWidth
-                      disabled={values.format==="ebook"? true:false}
-                    >
-                      <InputLabel id="library-label">Biblioteka</InputLabel>
-                      <Select
-                        value={values.library}
-                        onChange={handleChange}
-                        labelId="library-label"
-                        name="library"
-                        className={classes.selectEmpty}
-                        inputProps={{ "aria-label": "Without label" }}
-                        helperText={(errors.library && touched.library)&&errors.library}
-                        error={errors.library && touched.library}
+                        required
+                        className={classes.formControl}
+                        fullWidth
+                        disabled={values.format === "ebook" ? true : false}
                       >
-                        <MenuItem value="">
-                          <em>Brak</em>
-                        </MenuItem>
-                        <MenuItem value={"popieluszki"}>Popiełuszki</MenuItem>
-                        <MenuItem value={"kozmiana"}>Koźmiana</MenuItem>
-                        <MenuItem value={"promyka"}>Promyka</MenuItem>
-                        <MenuItem value={"zagorze"}>Zagórze</MenuItem>
-                        <MenuItem value={"rawa"}>Rawa</MenuItem>
-                      </Select>
-                    </FormControl>
-
-
-
-                    }
-                    
-                    
+                        <InputLabel id="library-label">Biblioteka</InputLabel>
+                        <Select
+                          value={values.library}
+                          onChange={handleChange}
+                          labelId="library-label"
+                          name="library"
+                          className={classes.selectEmpty}
+                          inputProps={{ "aria-label": "Without label" }}
+                          helperText={
+                            errors.library && touched.library && errors.library
+                          }
+                          error={errors.library && touched.library}
+                        >
+                          <MenuItem value="">
+                            <em>Brak</em>
+                          </MenuItem>
+                          <MenuItem value={"popieluszki"}>Popiełuszki</MenuItem>
+                          <MenuItem value={"kozmiana"}>Koźmiana</MenuItem>
+                          <MenuItem value={"promyka"}>Promyka</MenuItem>
+                          <MenuItem value={"zagorze"}>Zagórze</MenuItem>
+                          <MenuItem value={"rawa"}>Rawa</MenuItem>
+                        </Select>
+                      </FormControl>
+                    )}
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl
@@ -250,12 +280,14 @@ export default function AddBookForm(props) {
                       <InputLabel id="format-label">Format</InputLabel>
                       <Select
                         value={values.format}
-                        onChange={handleChange}
+                        onChange={e => {handleChange(e);  console.log(values.library="") }}
                         labelId="format-label"
                         name="format"
                         className={classes.selectEmpty}
                         inputProps={{ "aria-label": "Without label" }}
-                        helperText={(errors.format && touched.format)&&errors.format}
+                        helperText={
+                          errors.format && touched.format && errors.format
+                        }
                         error={errors.format && touched.format}
                       >
                         <MenuItem value="">
@@ -266,6 +298,11 @@ export default function AddBookForm(props) {
                         <MenuItem value={"journal"}>czasopismo</MenuItem>
                       </Select>
                     </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} sm={12}> 
+                        {success && <Alert severity="success">Udało Ci się dodać książkę do bazy</Alert>}
+                        {failed && <Alert severity="error">Wystąpił błąd podczas dodawania książki do bazy</Alert>}
                   </Grid>
                 </Grid>
                 <div className={classes.buttons}>
