@@ -45,8 +45,6 @@ export default function FloatingActionButton(props) {
   }
 
 
-
-
   return (
     <div>
       {openDrawer ? (

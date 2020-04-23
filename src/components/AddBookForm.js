@@ -15,9 +15,10 @@ import { Formik } from "formik";
 import { DatePicker } from "@material-ui/pickers";
 import * as Yup from "yup";
 import { IconButton } from "@material-ui/core";
-import Alert from '@material-ui/lab/Alert';
+import Alert from "@material-ui/lab/Alert";
 import { db } from "../config";
 import { useDispatch } from "react-redux";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 
 export default function AddBookForm(props) {
   const useStyles = makeStyles(theme => ({
@@ -61,14 +62,23 @@ export default function AddBookForm(props) {
     close: {
       marginTop: -15,
       marginRight: -15
+    },
+    autoComplete: {
+      marginTop: theme.spacing(-2)
     }
   }));
 
-
-  const [success, setSuccess] = useState(false)
-  const [failed, setFailed] = useState(false)
+  const [success, setSuccess] = useState(false);
+  const [failed, setFailed] = useState(false);
   const dispatch = useDispatch();
   const classes = useStyles();
+  const base = ["Biografia", "Biznes", "Ekonomia",  "Marketing", "Dla dzieci", "Dla młodzieży", "Fantasy", "Historia", "Horror",  "Informatyka", "Komiks", "Kryminał", "Sensacja", "Thriller", "Kuchnia", "Reportaź", "Literatura obyczajowa", "Literatura piękna obca", "Literatura pięka polska", "Nauka języków", "Nauki ścisłe", "Nauki społeczne i humanistyczne", "Podręczniki", "Poezja", "Dramat", "Poradniki", "Prawo", "Religie", "Rozwój osobisty", "Science fiction", "Sport", "Sztuka", "Turystyka", "Zdrowie"];
+  const genres = base.sort()
+  const defaultProps = {
+    options: genres,
+    getOptionLabel: option => option
+  };
+
   const handleClick = () => {
     dispatch({
       type: "OPEN_ADD_MODAL",
@@ -85,62 +95,64 @@ export default function AddBookForm(props) {
         date: new Date(),
         owner: "",
         library: "",
+        genre: "",
         format: ""
       }}
-      onSubmit={(values, { resetForm, setSubmitting,  }) => {
-        if (values.format==="ebook") {
-         const payload = {...values, library:"ebook" }
+      onSubmit={(values, { resetForm, setSubmitting }) => {
+        if (values.format === "ebook") {
+          const payload = { ...values, library: "ebook" };
           db.collection("books")
-          .add({
-            title: payload.title,
-            author: payload.author,
-            publisher: payload.publisher,
-            date: payload.date,
-            owner: payload.owner,
-            library: payload.library,
-            format: payload.format
-          })
-          .then(function() {
-            console.log("Document successfully written!");
-            resetForm();
-            setSubmitting(false);
-            setSuccess(true)
-          })
-          .catch(function(error) {
-            console.error("Error writing document: ", error);
-            setSubmitting(false);
-            setFailed(true)
-          });
+            .add({
+              title: payload.title,
+              author: payload.author,
+              publisher: payload.publisher,
+              date: payload.date,
+              owner: payload.owner,
+              library: payload.library,
+              format: payload.format
+            })
+            .then(function() {
+              console.log("Document successfully written!");
+              resetForm();
+              setSubmitting(false);
+              setSuccess(true);
+            })
+            .catch(function(error) {
+              console.error("Error writing document: ", error);
+              setSubmitting(false);
+              setFailed(true);
+            });
         } else {
           db.collection("books")
-          .add({
-            title: values.title,
-            author: values.author,
-            publisher: values.publisher,
-            date: values.date,
-            owner: values.owner,
-            library: values.library,
-            format: values.format
-          })
-          .then(function() {
-            console.log("Document successfully written!");
-            resetForm();
-            setSubmitting(false);
-            setSuccess(true)
-          })
-          .catch(function(error) {
-            console.error("Error writing document: ", error);
-            setSubmitting(false);
-            setFailed(true)
-          });
-          setSubmitting(false)
+            .add({
+              title: values.title,
+              author: values.author,
+              publisher: values.publisher,
+              date: values.date,
+              owner: values.owner,
+              genre: values.genre,
+              library: values.library,
+              format: values.format
+            })
+            .then(function() {
+              console.log("Document successfully written!");
+              resetForm();
+              setSubmitting(false);
+              setSuccess(true);
+            })
+            .catch(function(error) {
+              console.error("Error writing document: ", error);
+              setSubmitting(false);
+              setFailed(true);
+            });
+          setSubmitting(false);
         }
-        
       }}
       validationSchema={Yup.object().shape({
         title: Yup.string().required("To pole jest wymagane"),
         author: Yup.string().required("To pole jest wymagane"),
         owner: Yup.string().required("To pole jest wymagane"),
+        genre: Yup.string().required("To pole jest wymagane"),
         library: Yup.string().when("format", {
           is: format => format !== "ebook",
           then: Yup.string().required("To pole jest wymagane")
@@ -239,6 +251,64 @@ export default function AddBookForm(props) {
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
+                    <FormControl className={classes.formControl} fullWidth>
+                      <Autocomplete
+                        {...defaultProps}
+                        id="controlled-demo"
+                        name="genre"
+                        className={classes.autoComplete}
+                        value={values.genre}
+                        onChange={(event, newValue) => {
+                          setFieldValue("genre", newValue);
+                        }}
+                        renderInput={params => (
+                          <TextField
+                            {...params}
+                            label="controlled"
+                            margin="normal"
+                            helperText={
+                              errors.owner && touched.owner && errors.owner
+                            }
+                            error={errors.owner && touched.owner}
+                          />
+                        )}
+                      />
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <FormControl
+                      required
+                      className={classes.formControl}
+                      fullWidth
+                    >
+                      <InputLabel id="format-label">Format</InputLabel>
+                      <Select
+                        value={values.format}
+                        onChange={e => {
+                          handleChange(e);
+                          console.log((values.library = ""));
+                        }}
+                        labelId="format-label"
+                        name="format"
+                        className={classes.selectEmpty}
+                        inputProps={{ "aria-label": "Without label" }}
+                        helperText={
+                          errors.format && touched.format && errors.format
+                        }
+                        error={errors.format && touched.format}
+                      >
+                        <MenuItem value="">
+                          <em>Brak</em>
+                        </MenuItem>
+                        <MenuItem value={"ebook"}>ebook</MenuItem>
+                        <MenuItem value={"book"}>książka</MenuItem>
+                        <MenuItem value={"journal"}>czasopismo</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
                     {values.format !== "ebook" && (
                       <FormControl
                         required
@@ -262,47 +332,27 @@ export default function AddBookForm(props) {
                           <MenuItem value="">
                             <em>Brak</em>
                           </MenuItem>
-                          <MenuItem value={"popieluszki"}>Popiełuszki</MenuItem>
-                          <MenuItem value={"kozmiana"}>Koźmiana</MenuItem>
-                          <MenuItem value={"promyka"}>Promyka</MenuItem>
-                          <MenuItem value={"zagorze"}>Zagórze</MenuItem>
-                          <MenuItem value={"rawa"}>Rawa</MenuItem>
+                          <MenuItem value={"Popiełuszki"}>Popiełuszki</MenuItem>
+                          <MenuItem value={"Koźmiana"}>Koźmiana</MenuItem>
+                          <MenuItem value={"Promyka"}>Promyka</MenuItem>
+                          <MenuItem value={"Zagórze"}>Zagórze</MenuItem>
+                          <MenuItem value={"Rawa"}>Rawa</MenuItem>
                         </Select>
                       </FormControl>
                     )}
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl
-                      required
-                      className={classes.formControl}
-                      fullWidth
-                    >
-                      <InputLabel id="format-label">Format</InputLabel>
-                      <Select
-                        value={values.format}
-                        onChange={e => {handleChange(e);  console.log(values.library="") }}
-                        labelId="format-label"
-                        name="format"
-                        className={classes.selectEmpty}
-                        inputProps={{ "aria-label": "Without label" }}
-                        helperText={
-                          errors.format && touched.format && errors.format
-                        }
-                        error={errors.format && touched.format}
-                      >
-                        <MenuItem value="">
-                          <em>Brak</em>
-                        </MenuItem>
-                        <MenuItem value={"ebook"}>ebook</MenuItem>
-                        <MenuItem value={"book"}>książka</MenuItem>
-                        <MenuItem value={"journal"}>czasopismo</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
 
-                  <Grid item xs={12} sm={12}> 
-                        {success && <Alert severity="success">Udało Ci się dodać książkę do bazy</Alert>}
-                        {failed && <Alert severity="error">Wystąpił błąd podczas dodawania książki do bazy</Alert>}
+                  <Grid item xs={12} sm={12}>
+                    {success && (
+                      <Alert severity="success">
+                        Udało Ci się dodać książkę do bazy
+                      </Alert>
+                    )}
+                    {failed && (
+                      <Alert severity="error">
+                        Wystąpił błąd podczas dodawania książki do bazy
+                      </Alert>
+                    )}
                   </Grid>
                 </Grid>
                 <div className={classes.buttons}>
