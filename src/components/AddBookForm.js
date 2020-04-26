@@ -19,6 +19,8 @@ import Alert from "@material-ui/lab/Alert";
 import { db } from "../config";
 import { useDispatch } from "react-redux";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import AddFile from './AddFIle'
+
 
 export default function AddBookForm(props) {
   const useStyles = makeStyles(theme => ({
@@ -116,6 +118,9 @@ export default function AddBookForm(props) {
               resetForm();
               setSubmitting(false);
               setSuccess(true);
+              dispatch({
+                type: "TABLE_UPDATED"
+              })
             })
             .catch(function(error) {
               console.error("Error writing document: ", error);
@@ -139,6 +144,9 @@ export default function AddBookForm(props) {
               resetForm();
               setSubmitting(false);
               setSuccess(true);
+              dispatch({
+                type: "TABLE_UPDATED"
+              })
             })
             .catch(function(error) {
               console.error("Error writing document: ", error);
@@ -251,10 +259,11 @@ export default function AddBookForm(props) {
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <FormControl className={classes.formControl} fullWidth>
+                    <FormControl className={classes.formControl} required fullWidth>
                       <Autocomplete
+                        
                         {...defaultProps}
-                        id="controlled-demo"
+                        id="add-genre"
                         name="genre"
                         className={classes.autoComplete}
                         value={values.genre}
@@ -264,7 +273,8 @@ export default function AddBookForm(props) {
                         renderInput={params => (
                           <TextField
                             {...params}
-                            label="controlled"
+                            required
+                            label="Kategoria"
                             margin="normal"
                             helperText={
                               errors.owner && touched.owner && errors.owner
@@ -341,7 +351,7 @@ export default function AddBookForm(props) {
                       </FormControl>
                     )}
                   </Grid>
-
+                          <AddFile/>
                   <Grid item xs={12} sm={12}>
                     {success && (
                       <Alert severity="success">

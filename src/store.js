@@ -1,21 +1,26 @@
 import {
   createStore,
   combineReducers,
-  applyMiddleware
+  applyMiddleware,
+
 } from "redux"
 import logger from "redux-logger"
 
 //Reducers
 
 import {
-  userReducer, drawerOpen, openAddModal
+  userReducer,
+  drawerOpen,
+  openAddModal,
+  updateTable
 } from "./reducers"
 
 //combineReducers
 const reducers = combineReducers({
   userReducer: userReducer,
   drawerOpen: drawerOpen,
-  openAddModal: openAddModal
+  openAddModal: openAddModal,
+  updateTable: updateTable
 
 })
 

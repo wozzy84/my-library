@@ -3,6 +3,7 @@ import "firebase/auth";
 import "firebase/firestore";
 import "firebase/functions";
 import "firebase/analytics"
+import 'firebase/storage'
 import React from "react";
 // Initialize Firebase
 
@@ -25,5 +26,6 @@ const db = firebase.firestore();
 const functions = firebase.functions();
 const providerFB = new firebase.auth.FacebookAuthProvider();
 const providerGoogle = new firebase.auth.GoogleAuthProvider();
+const firebaseStorage = firebase.storage()
 
-export { db, auth, functions, providerFB, providerGoogle };     
+export { db, auth, functions, providerFB, providerGoogle, firebaseStorage };     

@@ -22,4 +22,13 @@ function openAddModal(state = false, action) {
     }
 }
 
-export { userReducer, drawerOpen, openAddModal}
+function updateTable(state=1,action) {
+    switch(action.type) {
+        case "TABLE_UPDATED":
+            const updated = state+1;
+            return updated
+        default: return state
+    }
+}
+
+export { userReducer, drawerOpen, openAddModal, updateTable}
