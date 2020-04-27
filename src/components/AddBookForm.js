@@ -17,10 +17,10 @@ import * as Yup from "yup";
 import { IconButton } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import { db } from "../config";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import AddFile from './AddFIle'
-
+import { firebaseStorage } from "../config";
 
 export default function AddBookForm(props) {
   const useStyles = makeStyles(theme => ({
@@ -73,9 +73,12 @@ export default function AddBookForm(props) {
   const [success, setSuccess] = useState(false);
   const [failed, setFailed] = useState(false);
   const dispatch = useDispatch();
+  const downloadLink = useSelector(state=>state.downloadLink)
+  const reference = useSelector(state=>state.reference)
   const classes = useStyles();
   const base = ["Biografia", "Biznes", "Ekonomia",  "Marketing", "Dla dzieci", "Dla młodzieży", "Fantasy", "Historia", "Horror",  "Informatyka", "Komiks", "Kryminał", "Sensacja", "Thriller", "Kuchnia", "Reportaź", "Literatura obyczajowa", "Literatura piękna obca", "Literatura pięka polska", "Nauka języków", "Nauki ścisłe", "Nauki społeczne i humanistyczne", "Podręczniki", "Poezja", "Dramat", "Poradniki", "Prawo", "Religie", "Rozwój osobisty", "Science fiction", "Sport", "Sztuka", "Turystyka", "Zdrowie"];
   const genres = base.sort()
+
   const defaultProps = {
     options: genres,
     getOptionLabel: option => option
@@ -86,6 +89,13 @@ export default function AddBookForm(props) {
       type: "OPEN_ADD_MODAL",
       open: false
     });
+    if(!success) {
+      firebaseStorage.ref(reference).delete()
+      dispatch({
+        type: "CLEAR_STORAGE",
+        clear: true
+      })
+    }
   };
 
   return (
@@ -98,7 +108,8 @@ export default function AddBookForm(props) {
         owner: "",
         library: "",
         genre: "",
-        format: ""
+        format: "",
+        download: downloadLink
       }}
       onSubmit={(values, { resetForm, setSubmitting }) => {
         if (values.format === "ebook") {
@@ -111,7 +122,8 @@ export default function AddBookForm(props) {
               date: payload.date,
               owner: payload.owner,
               library: payload.library,
-              format: payload.format
+              format: payload.format,
+              download: downloadLink
             })
             .then(function() {
               console.log("Document successfully written!");
@@ -121,6 +133,10 @@ export default function AddBookForm(props) {
               dispatch({
                 type: "TABLE_UPDATED"
               })
+            })
+            dispatch({
+              type:"SET_REFERENCE",
+              reference: null
             })
             .catch(function(error) {
               console.error("Error writing document: ", error);
@@ -137,7 +153,8 @@ export default function AddBookForm(props) {
               owner: values.owner,
               genre: values.genre,
               library: values.library,
-              format: values.format
+              format: values.format,
+              download: ""
             })
             .then(function() {
               console.log("Document successfully written!");
@@ -148,6 +165,7 @@ export default function AddBookForm(props) {
                 type: "TABLE_UPDATED"
               })
             })
+      
             .catch(function(error) {
               console.error("Error writing document: ", error);
               setSubmitting(false);
@@ -207,7 +225,7 @@ export default function AddBookForm(props) {
                       id="add-title"
                       name="title"
                       label="Tutuł"
-                      onBlur={handleBlur}
+                      onBlur={e => {handleBlur(e); setSuccess(false)}}
                       fullWidth
                       helperText={errors.title && touched.title && errors.title}
                       error={errors.title && touched.title}
@@ -221,6 +239,7 @@ export default function AddBookForm(props) {
                       name="author"
                       label="Autor"
                       fullWidth
+                      onBlur={e => {handleBlur(e); setSuccess(false)}}
                       helperText={
                         errors.author && touched.author && errors.author
                       }
@@ -234,6 +253,7 @@ export default function AddBookForm(props) {
                       id="add-owner"
                       name="publisher"
                       label="Wydawnictwo"
+                      onBlur={e => {handleBlur(e); setSuccess(false)}}
                       fullWidth
                     />
                   </Grid>
@@ -243,6 +263,7 @@ export default function AddBookForm(props) {
                       views={["year"]}
                       label="Rok wydania"
                       value={values.date}
+                      onBlur={e => {handleBlur(e); setSuccess(false)}}
                       onChange={value => setFieldValue("date", value)}
                     />
                   </Grid>
@@ -254,6 +275,7 @@ export default function AddBookForm(props) {
                       name="owner"
                       label="Właściciel"
                       fullWidth
+                      onBlur={e => {handleBlur(e); setSuccess(false)}}
                       helperText={errors.owner && touched.owner && errors.owner}
                       error={errors.owner && touched.owner}
                     />
@@ -261,7 +283,7 @@ export default function AddBookForm(props) {
                   <Grid item xs={12} sm={6}>
                     <FormControl className={classes.formControl} required fullWidth>
                       <Autocomplete
-                        
+                        onBlur={e => {handleBlur(e); setSuccess(false)}}
                         {...defaultProps}
                         id="add-genre"
                         name="genre"
@@ -273,7 +295,7 @@ export default function AddBookForm(props) {
                         renderInput={params => (
                           <TextField
                             {...params}
-                            required
+                        
                             label="Kategoria"
                             margin="normal"
                             helperText={
@@ -288,6 +310,7 @@ export default function AddBookForm(props) {
 
                   <Grid item xs={12} sm={6}>
                     <FormControl
+                     onBlur={e => {handleBlur(e); setSuccess(false)}}
                       required
                       className={classes.formControl}
                       fullWidth
@@ -321,6 +344,7 @@ export default function AddBookForm(props) {
                   <Grid item xs={12} sm={6}>
                     {values.format !== "ebook" && (
                       <FormControl
+                      onBlur={e => {handleBlur(e); setSuccess(false)}}
                         required
                         className={classes.formControl}
                         fullWidth
@@ -351,7 +375,8 @@ export default function AddBookForm(props) {
                       </FormControl>
                     )}
                   </Grid>
-                          <AddFile/>
+                  {values.format==="ebook" && <AddFile/>}
+                          
                   <Grid item xs={12} sm={12}>
                     {success && (
                       <Alert severity="success">

@@ -6,6 +6,10 @@ import { makeStyles } from "@material-ui/core/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import { useState } from "react";
 import { firebaseStorage } from "../config";
+import { useDispatch, useSelector } from "react-redux";
+import DeleteForeverOutlinedIcon from "@material-ui/icons/DeleteForeverOutlined";
+import { IconButton } from "@material-ui/core";
+
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -17,10 +21,26 @@ const useStyles = makeStyles(theme => ({
     display: "none"
   },
   LinearProgress: {
-    width: "100%",
+    width: "80%",
     "& > * + *": {
       marginTop: theme.spacing(2)
     }
+  },
+  deleteButton: {
+    marginLeft: -10
+  },
+  progressField: {
+    postion: "relative"
+  },
+  addedFiles: {
+    margin: theme.spacing(1),
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  fileName: {
+    
+    fontSize: 14 
+
   }
 }));
 
@@ -28,14 +48,25 @@ export default function AddFile() {
   const classes = useStyles();
   const [currentFile, setCurrentFile] = useState(null);
   const [progressValue, setProgressValue] = useState(0);
-  const [downloadLink, setDownloadLink] = useState("");
+  const dispatch = useDispatch();
+  const [completed, setCompleted] = useState(false);
+
+  const reference = useSelector(state => state.reference)
+  const clearStorage = useSelector(state=> state.clearStorage)
+
+  const handleDelete = () => {
+    firebaseStorage.ref(reference).delete()
+    setCurrentFile(null)
+
+  };
 
   const handleInputChange = e => {
     setCurrentFile(e.target.files[0]);
-
-    const storageRef = firebaseStorage.ref(
-      "images_pw/" + e.target.files[0].name
-    );
+    dispatch({
+     type: "SET_REFERENCE",
+     reference:"images_pw/" + e.target.files[0].name  
+    });
+    const storageRef = firebaseStorage.ref("images_pw/" + e.target.files[0].name);
     const uploadTask = storageRef.put(e.target.files[0]);
 
     uploadTask.on(
@@ -50,10 +81,20 @@ export default function AddFile() {
       },
       function() {
         uploadTask.snapshot.ref.getDownloadURL().then(function(link) {
-          console.log(link);
+          dispatch({
+            type: "DOWNLOAD_LINK",
+            link: link
+          });
         });
+        setCompleted(true)
+        if(clearStorage) {
+          firebaseStorage.ref(reference).delete()
+        }
+
       }
     );
+      
+    
   };
 
   return (
@@ -77,16 +118,23 @@ export default function AddFile() {
           </label>
         </div>
       </Grid>
-      <Grid item xs={12} sm={6}>
-        <Typography color="primary">
-          {currentFile ? currentFile.name : null}
-        </Typography>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <div className={classes.LinearProgress}>
+      {currentFile &&
+             <Grid container xs={12} spacing={2} className={classes.addedFiles}>
+        <Grid item xs={12} sm={6} wrap="nowrap">
+          <Typography className={classes.fileName} noWrap>{currentFile ? currentFile.name : null}</Typography>
+        </Grid>
+        <Grid item xs={9} sm={5}>
           <LinearProgress variant="determinate" value={progressValue} />
-        </div>
-      </Grid>
+        </Grid>
+
+        <Grid item xs={3} sm={1}>
+          <IconButton className={classes.deleteButton} onClick={handleDelete} disabled={completed?false:true}>
+            <DeleteForeverOutlinedIcon />
+          </IconButton>
+        </Grid>
+      </Grid> 
+      }
+
     </>
   );
 }

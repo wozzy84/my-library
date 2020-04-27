@@ -12,12 +12,15 @@ const useStyles = makeStyles(theme => ({
   modal: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+
   },
   root: {
+    overflowY: "auto",
     display: "flex",
     flexWrap: "wrap",
     outline:"none",
+    maxHeight: "100vh",
     "& > *": {
       // margin: theme.spacing(1),
       // width: theme.spacing(100),

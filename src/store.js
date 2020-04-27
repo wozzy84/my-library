@@ -12,7 +12,10 @@ import {
   userReducer,
   drawerOpen,
   openAddModal,
-  updateTable
+  updateTable,
+  handleDownloadLink,
+  setReference,
+  clearStorage
 } from "./reducers"
 
 //combineReducers
@@ -20,7 +23,10 @@ const reducers = combineReducers({
   userReducer: userReducer,
   drawerOpen: drawerOpen,
   openAddModal: openAddModal,
-  updateTable: updateTable
+  updateTable: updateTable,
+  downloadLink: handleDownloadLink,
+  reference:setReference,
+  clearStorage: clearStorage
 
 })
 
