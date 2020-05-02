@@ -15,7 +15,8 @@ import {
   updateTable,
   handleDownloadLink,
   setReference,
-  clearStorage
+  clearStorage,
+  openInfoModal
 } from "./reducers"
 
 //combineReducers
@@ -26,7 +27,8 @@ const reducers = combineReducers({
   updateTable: updateTable,
   downloadLink: handleDownloadLink,
   reference:setReference,
-  clearStorage: clearStorage
+  clearStorage: clearStorage,
+  openInfoModal:openInfoModal
 
 })
 

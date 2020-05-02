@@ -20,10 +20,9 @@ import { db } from "../config";
 import { useDispatch, useSelector } from "react-redux";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import AddFile from './AddFIle'
-import {categories} from '../assets/categories'
 import { firebaseStorage } from "../config";
 
-export default function AddBookForm(props) {
+export default function EditBookInfo(props) {
   const useStyles = makeStyles(theme => ({
     appBar: {
       position: "relative"
@@ -77,8 +76,8 @@ export default function AddBookForm(props) {
   const downloadLink = useSelector(state=>state.downloadLink)
   const reference = useSelector(state=>state.reference)
   const classes = useStyles();
-  
-  const genres = categories.sort()
+  const base = ["Biografia", "Biznes", "Ekonomia",  "Marketing", "Dla dzieci", "Dla młodzieży", "Fantasy", "Historia", "Horror",  "Informatyka", "Komiks", "Kryminał", "Sensacja", "Thriller", "Kuchnia", "Reportaź", "Literatura obyczajowa", "Literatura piękna obca", "Literatura pięka polska", "Nauka języków", "Nauki ścisłe", "Nauki społeczne i humanistyczne", "Podręczniki", "Poezja", "Dramat", "Poradniki", "Prawo", "Religie", "Rozwój osobisty", "Science fiction", "Sport", "Sztuka", "Turystyka", "Zdrowie"];
+  const genres = base.sort()
 
   const defaultProps = {
     options: genres,
@@ -110,8 +109,7 @@ export default function AddBookForm(props) {
         library: "",
         genre: "",
         format: "",
-        download: downloadLink,
-        reference:reference
+        download: downloadLink
       }}
       onSubmit={(values, { resetForm, setSubmitting }) => {
         if (values.format === "ebook") {
@@ -125,8 +123,7 @@ export default function AddBookForm(props) {
               owner: payload.owner,
               library: payload.library,
               format: payload.format,
-              download: downloadLink,
-              reference: reference
+              download: downloadLink
             })
             .then(function() {
               console.log("Document successfully written!");
@@ -157,8 +154,7 @@ export default function AddBookForm(props) {
               genre: values.genre,
               library: values.library,
               format: values.format,
-              download: "",
-              reference:""
+              download: ""
             })
             .then(function() {
               console.log("Document successfully written!");
@@ -339,8 +335,8 @@ export default function AddBookForm(props) {
                           <em>Brak</em>
                         </MenuItem>
                         <MenuItem value={"ebook"}>ebook</MenuItem>
-                        <MenuItem value={"Książka"}>książka</MenuItem>
-                        <MenuItem value={"Czasopismo"}>czasopismo</MenuItem>
+                        <MenuItem value={"book"}>książka</MenuItem>
+                        <MenuItem value={"journal"}>czasopismo</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>

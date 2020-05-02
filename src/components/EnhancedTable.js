@@ -13,20 +13,14 @@ import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
-import Checkbox from "@material-ui/core/Checkbox";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
-import DeleteIcon from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
-import {useEffect, useState} from "react"
-import { db} from "../config"
-import { useSelector } from "react-redux";
-
-
-
-
+import { useEffect, useState } from "react";
+import { db } from "../config";
+import { useSelector, useDispatch } from "react-redux";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -68,15 +62,7 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-  const {
-    classes,
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort
-  } = props;
+  const { classes, order, orderBy, rowCount, onRequestSort } = props;
   const createSortHandler = property => event => {
     onRequestSort(event, property);
   };
@@ -84,9 +70,7 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          {/* Tutaj były checkboxy */}
-        </TableCell>
+        <TableCell padding="checkbox">{/* Tutaj były checkboxy */}</TableCell>
         {headCells.map(headCell => (
           <TableCell
             key={headCell.id}
@@ -115,9 +99,7 @@ function EnhancedTableHead(props) {
 
 EnhancedTableHead.propTypes = {
   classes: PropTypes.object.isRequired,
-  numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(["asc", "desc"]).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired
@@ -128,16 +110,6 @@ const useToolbarStyles = makeStyles(theme => ({
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(1)
   },
-  highlight:
-    theme.palette.type === "light"
-      ? {
-          color: theme.palette.secondary.main,
-          backgroundColor: lighten(theme.palette.secondary.light, 0.85)
-        }
-      : {
-          color: theme.palette.text.primary,
-          backgroundColor: theme.palette.secondary.dark
-        },
   title: {
     flex: "1 1 100%"
   }
@@ -145,14 +117,9 @@ const useToolbarStyles = makeStyles(theme => ({
 
 const EnhancedTableToolbar = props => {
   const classes = useToolbarStyles();
-  const { numSelected } = props;
 
   return (
-    <Toolbar
-      className={clsx(classes.root, {
-        [classes.highlight]: numSelected > 0
-      })}
-    >
+    <Toolbar className={classes.root}>
       <Typography
         className={classes.title}
         variant="h6"
@@ -168,10 +135,6 @@ const EnhancedTableToolbar = props => {
       </Tooltip>
     </Toolbar>
   );
-};
-
-EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired
 };
 
 const useStyles = makeStyles(theme => ({
@@ -202,71 +165,40 @@ export default function EnhancedTable() {
   const classes = useStyles();
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
-  const [selected, setSelected] = React.useState([]);
+
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [rows, setRows] = useState([])
-  const updateTable = useSelector(state=>state.updateTable)
-  console.log("updateTable", updateTable)
-
-
+  const [rows, setRows] = useState([]);
+  const updateTable = useSelector(state => state.updateTable);
+  const dispatch = useDispatch()
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
-
   };
 
-  const handleSelectAllClick = event => {
-    if (event.target.checked) {
-      const newSelecteds = rows.map(n => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
+  useEffect(() => {
+    db.collection("books")
+      .get()
+      .then(snapshot => {
+        let t = [];
+        snapshot.forEach(doc => {
+          t = [...t, {...doc.data(),id:doc.id}];
+        });
+        setRows(t);
+      });
+  }, [updateTable]);
 
-
-  useEffect( () => {
-    db.collection('books').get()
-    .then(snapshot => {
-      let t = []
-   
-        snapshot.forEach(doc =>{
-          
-            
-            t = [...t, doc.data()]
-
-           
-         
-        })
-      console.log(t)
-      setRows(t)
-        
+  const handleClick = (event) => {
+    dispatch({
+      type: "OPEN_INFO_MODAL",
+      payload: {
+        open: true,
+        data: {...rows.filter((e)=>e.id === event.currentTarget.id)}
+      }
     })
-}, [updateTable])
-  
-
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelected(newSelected);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -282,15 +214,13 @@ export default function EnhancedTable() {
     setDense(event.target.checked);
   };
 
-  const isSelected = name => selected.indexOf(name) !== -1;
-
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar />
         <TableContainer>
           <Table
             className={classes.table}
@@ -300,10 +230,8 @@ export default function EnhancedTable() {
           >
             <EnhancedTableHead
               classes={classes}
-              numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
@@ -311,18 +239,16 @@ export default function EnhancedTable() {
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row.name);
+                  console.log(row)
                   const labelId = `enhanced-table-checkbox-${index}`;
-
                   return (
                     <TableRow
                       hover
                       onClick={event => handleClick(event, row.name)}
                       role="checkbox"
-                      aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.name}
-                      selected={isItemSelected}
+                      id={row.id}
+                      key={row.id}
                     >
                       <TableCell padding="checkbox">
                         {/* tutaj były checkboxy */}

@@ -105,7 +105,7 @@ export default function AddFile() {
       <Grid xs={12}>
         <div className={classes.root}>
           <input
-            accept="/*"
+            accept="/.epub, .mobi"
             className={classes.input}
             id="contained-button-file"
             type="file"

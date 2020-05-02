@@ -1,3 +1,18 @@
+export const intialInfo = [{
+  title:"",
+  author:"",
+  publisher: "",
+  date: "",
+  owner:"",
+  library:"",
+  genre: "",
+  format:"",
+  download: "",
+
+}]
+
+
+
 function userReducer(state = {}, action) {
   switch (action.type) {
     case "LOGGED_USER":
@@ -62,6 +77,15 @@ function clearStorage (state = false, action) {
   }
 }
 
+function openInfoModal (state={open:false, data:intialInfo}, action) {
+  switch(action.type) {
+    case "OPEN_INFO_MODAL":
+      return action.payload
+    default: 
+    return state
+  }
+}
+
 export {
   userReducer,
   drawerOpen,
@@ -69,5 +93,6 @@ export {
   updateTable,
   handleDownloadLink,
   setReference,
-  clearStorage
+  clearStorage,
+  openInfoModal
 };

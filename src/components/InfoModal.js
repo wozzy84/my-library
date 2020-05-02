@@ -4,22 +4,25 @@ import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography"
+import Typography from "@material-ui/core/Typography";
 import { useSelector, useDispatch } from "react-redux";
-import AddBookForm from "./AddBookForm";
+import Grid from "@material-ui/core/Grid";
+import CancelIcon from "@material-ui/icons/Cancel";
+import { IconButton } from "@material-ui/core";
+import EditBookInfo from "./EditBookInfo";
+import InfoNavigation from "./InfoNavigation";
 
 const useStyles = makeStyles(theme => ({
   modal: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-
+    justifyContent: "center"
   },
   root: {
     overflowY: "auto",
     display: "flex",
     flexWrap: "wrap",
-    outline:"none",
+    outline: "none",
     maxHeight: "100vh",
     "& > *": {
       // margin: theme.spacing(1),
@@ -29,10 +32,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function AddBookModal() {
+export default function InfoModal() {
   const classes = useStyles();
-  const openAddModal = useSelector(state => state.openAddModal);
-
+  const openInfoModal = useSelector(state => state.openInfoModal);
 
   return (
     <div>
@@ -40,19 +42,18 @@ export default function AddBookModal() {
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         className={classes.modal}
-        open={openAddModal}
+        open={openInfoModal.open}
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500
         }}
       >
-        <Fade in={openAddModal}>
+        <Fade in={openInfoModal.open}>
           <div className={classes.root}>
-            <Paper elevation={3} >
-        <AddBookForm/>
-
-            </Paper>   
+            <Paper elevation={3}>
+              <InfoNavigation />
+            </Paper>
           </div>
         </Fade>
       </Modal>
