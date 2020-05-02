@@ -85,6 +85,14 @@ function openInfoModal (state={open:false, data:intialInfo}, action) {
     return state
   }
 }
+function isEditing (state=false, action) {
+  switch(action.type) {
+    case "IS_EDITING":
+      return action.edit
+      default: 
+      return state
+  }
+}
 
 export {
   userReducer,
@@ -94,5 +102,6 @@ export {
   handleDownloadLink,
   setReference,
   clearStorage,
-  openInfoModal
+  openInfoModal,
+  isEditing
 };

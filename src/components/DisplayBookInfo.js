@@ -94,6 +94,13 @@ export default function DisplayBookInfo(props) {
     }
   };
 
+  const handleEdit = () => {
+    dispatch({
+      type: 'IS_EDITING',
+      edit: true
+    })
+  }
+
   return (
     <div className={classes.layout}>
       <Paper elevation={0} className={classes.paper}>
@@ -177,6 +184,7 @@ export default function DisplayBookInfo(props) {
               className={classes.actionBtn}
               color="primary"
               aria-label="edit"
+              onClick={handleEdit}
             >
               <EditIcon />
             </Fab>

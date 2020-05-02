@@ -90,11 +90,8 @@ export default function AddFile() {
         if(clearStorage) {
           firebaseStorage.ref(reference).delete()
         }
-
       }
     );
-      
-    
   };
 
   return (

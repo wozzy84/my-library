@@ -16,7 +16,8 @@ import {
   handleDownloadLink,
   setReference,
   clearStorage,
-  openInfoModal
+  openInfoModal,
+  isEditing
 } from "./reducers"
 
 //combineReducers
@@ -28,7 +29,8 @@ const reducers = combineReducers({
   downloadLink: handleDownloadLink,
   reference:setReference,
   clearStorage: clearStorage,
-  openInfoModal:openInfoModal
+  openInfoModal:openInfoModal,
+  isEditing: isEditing
 
 })
 
