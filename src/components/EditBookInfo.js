@@ -4,17 +4,14 @@ import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
-import Button from "@material-ui/core/Button";
 import { useState } from "react";
 import Select from "@material-ui/core/Select";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
-import CancelIcon from "@material-ui/icons/Cancel";
 import { Formik } from "formik";
 import { DatePicker } from "@material-ui/pickers";
 import * as Yup from "yup";
-import { IconButton } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import { db } from "../config";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,9 +24,6 @@ import { categories } from "../assets/categories";
 
 export default function EditBookInfo(props) {
   const useStyles = makeStyles((theme) => ({
-    appBar: {
-      position: "relative",
-    },
     layout: {
       width: "auto",
       marginLeft: theme.spacing(2),
@@ -46,9 +40,6 @@ export default function EditBookInfo(props) {
         padding: theme.spacing(3),
       },
     },
-    stepper: {
-      padding: theme.spacing(3, 0, 5),
-    },
     buttons: {
       display: "flex",
       justifyContent: "flex-end",
@@ -57,7 +48,6 @@ export default function EditBookInfo(props) {
       marginTop: theme.spacing(3),
       marginLeft: theme.spacing(1),
     },
-
     formControl: {
       minWidth: 120,
     },
@@ -80,7 +70,6 @@ export default function EditBookInfo(props) {
   const downloadLink = useSelector((state) => state.downloadLink);
   const reference = useSelector((state) => state.reference);
   const classes = useStyles();
-
   const genres = categories.sort();
 
   const defaultProps = {
@@ -104,34 +93,18 @@ export default function EditBookInfo(props) {
 
   return (
     <Formik
-      initialValues={{
-        title: data.title,
-        author: data.author,
-        publisher: data.publisher,
-        date:
-          typeof data.date.toDate === "function"
-            ? data.date.toDate()
-            : data.date,
-        owner: data.owner,
-        library: data.library,
-        genre: data.genre,
-        format: data.format,
-        download: data.download,
+      initialValues={{...data,  date:
+        typeof data.date.toDate === "function"
+          ? data.date.toDate()
+          : data.date,
       }}
       onSubmit={(values, { resetForm, setSubmitting }) => {
         if (values.format === "ebook") {
-          const payload = { ...values, library: "ebook" };
           db.collection("books")
             .doc(data.id)
             .set({
-              title: payload.title,
-              author: payload.author,
-              publisher: payload.publisher,
-              date: payload.date,
-              owner: payload.owner,
-              library: payload.library,
-              format: payload.format,
-              download: downloadLink,
+              ...values,
+              library: "ebook",
             })
             .then(function () {
               console.log("Document successfully written!");
@@ -144,11 +117,18 @@ export default function EditBookInfo(props) {
               dispatch({
                 type: "SET_REFERENCE",
                 reference: null,
-              })
+              });
               dispatch({
                 type: "IS_EDITING",
-                edit: false
-              })
+                edit: false,
+              });
+              dispatch({
+                type: "OPEN_INFO_MODAL",
+                payload: {
+                  open: true,
+                  data: [{ ...values, library: "ebook" }],
+                },
+              });
             })
             .catch(function (error) {
               console.error("Error writing document: ", error);
@@ -158,18 +138,17 @@ export default function EditBookInfo(props) {
         } else {
           db.collection("books")
             .doc(data.id)
-            .set({
-              title: values.title,
-              author: values.author,
-              publisher: values.publisher,
-              date: values.date,
-              owner: values.owner,
-              genre: values.genre,
-              library: values.library,
-              format: values.format,
-              download: "",
-            })
+            .set(values)
             .then(function () {
+              dispatch({
+                type: "OPEN_INFO_MODAL",
+                payload: {
+                  open: true,
+                  data: [
+                    values
+                  ],
+                },
+              });
               console.log("Document successfully written!");
               resetForm();
               setSubmitting(false);
@@ -179,8 +158,8 @@ export default function EditBookInfo(props) {
               });
               dispatch({
                 type: "IS_EDITING",
-                edit: false
-              })
+                edit: false,
+              });
             })
 
             .catch(function (error) {
