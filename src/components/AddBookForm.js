@@ -22,12 +22,10 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import AddFile from "./AddFIle";
 import { categories } from "../assets/categories";
 import { firebaseStorage } from "../config";
+import { intialInfo } from "../reducers";
 
 export default function AddBookForm(props) {
   const useStyles = makeStyles((theme) => ({
-    appBar: {
-      position: "relative",
-    },
     layout: {
       width: "auto",
       marginLeft: theme.spacing(2),
@@ -43,9 +41,6 @@ export default function AddBookForm(props) {
       [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
         padding: theme.spacing(3),
       },
-    },
-    stepper: {
-      padding: theme.spacing(3, 0, 5),
     },
     buttons: {
       display: "flex",
@@ -102,31 +97,17 @@ export default function AddBookForm(props) {
   return (
     <Formik
       initialValues={{
-        title: "",
-        author: "",
-        publisher: "",
-        date: new Date(),
-        owner: "",
-        library: "",
-        genre: "",
-        format: "",
+        ...intialInfo,
         download: downloadLink,
         reference: reference,
       }}
       onSubmit={(values, { resetForm, setSubmitting }) => {
+        console.log("values", values);
         if (values.format === "ebook") {
-          const payload = { ...values, library: "ebook" };
           db.collection("books")
             .add({
-              title: payload.title,
-              author: payload.author,
-              publisher: payload.publisher,
-              date: payload.date,
-              owner: payload.owner,
-              library: payload.library,
-              format: payload.format,
-              download: downloadLink,
-              reference: reference,
+              ...values,
+              library: "ebook",
             })
             .then(function () {
               console.log("Document successfully written!");
@@ -149,18 +130,7 @@ export default function AddBookForm(props) {
             });
         } else {
           db.collection("books")
-            .add({
-              title: values.title,
-              author: values.author,
-              publisher: values.publisher,
-              date: values.date,
-              owner: values.owner,
-              genre: values.genre,
-              library: values.library,
-              format: values.format,
-              download: "",
-              reference: "",
-            })
+            .add(values)
             .then(function () {
               console.log("Document successfully written!");
               resetForm();

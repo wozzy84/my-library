@@ -66,7 +66,7 @@ export default function EditBookInfo(props) {
   const [success, setSuccess] = useState(false);
   const [failed, setFailed] = useState(false);
   const dispatch = useDispatch();
-  const data = useSelector((state) => state.openInfoModal.data[0]);
+  const data = useSelector((state) => state.openInfoModal.data);
   const downloadLink = useSelector((state) => state.downloadLink);
   const reference = useSelector((state) => state.reference);
   const classes = useStyles();
@@ -93,10 +93,12 @@ export default function EditBookInfo(props) {
 
   return (
     <Formik
-      initialValues={{...data,  date:
-        typeof data.date.toDate === "function"
-          ? data.date.toDate()
-          : data.date,
+      initialValues={{
+        ...data,
+        date:
+          typeof data.date.toDate === "function"
+            ? data.date.toDate()
+            : data.date,
       }}
       onSubmit={(values, { resetForm, setSubmitting }) => {
         if (values.format === "ebook") {
@@ -126,7 +128,7 @@ export default function EditBookInfo(props) {
                 type: "OPEN_INFO_MODAL",
                 payload: {
                   open: true,
-                  data: [{ ...values, library: "ebook" }],
+                  data: { ...values, library: "ebook" },
                 },
               });
             })
@@ -144,9 +146,7 @@ export default function EditBookInfo(props) {
                 type: "OPEN_INFO_MODAL",
                 payload: {
                   open: true,
-                  data: [
-                    values
-                  ],
+                  data: values,
                 },
               });
               console.log("Document successfully written!");

@@ -62,18 +62,21 @@ export default function DisplayBookInfo(props) {
 
   const classes = useStyles();
   const dispatch = useDispatch();
-  const data = useSelector((state) => state.openInfoModal.data[0]);
+  const data = useSelector((state) => state.openInfoModal.data);
   const handleDelete = () => {
-    db.collection("books").doc(data.id).delete()
-    .then(function () {
-      "file deleted";
-    })
-    .catch(function (error) {
-      console.log(error);
-    });;
-    dispatch({
-      type: "TABLE_UPDATED",
-    });
+    db.collection("books")
+      .doc(data.id)
+      .delete()
+      .then(function () {
+        console.log("file deleted");
+        dispatch({
+          type: "TABLE_UPDATED",
+        });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
     dispatch({
       type: "OPEN_INFO_MODAL",
       payload: {
@@ -96,10 +99,10 @@ export default function DisplayBookInfo(props) {
 
   const handleEdit = () => {
     dispatch({
-      type: 'IS_EDITING',
-      edit: true
-    })
-  }
+      type: "IS_EDITING",
+      edit: true,
+    });
+  };
 
   return (
     <div className={classes.layout}>

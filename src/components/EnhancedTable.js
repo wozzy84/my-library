@@ -192,11 +192,12 @@ export default function EnhancedTable() {
   }, [updateTable]);
 
   const handleClick = (event) => {
+    const filtered = rows.filter((e)=>e.id === event.currentTarget.id)
     dispatch({
       type: "OPEN_INFO_MODAL",
       payload: {
         open: true,
-        data: {...rows.filter((e)=>e.id === event.currentTarget.id)}
+        data: filtered[0]
       }
     })
   };

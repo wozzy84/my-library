@@ -1,16 +1,14 @@
-export const intialInfo = [{
+export const intialInfo = {
   title:"",
   author:"",
   publisher: "",
-  date: "",
+  date: new Date(),
   owner:"",
   library:"",
   genre: "",
   format:"",
   download: "",
-
-}]
-
+}
 
 
 function userReducer(state = {}, action) {
