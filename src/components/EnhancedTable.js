@@ -45,7 +45,7 @@ function stableSort(array, comparator) {
     if (order !== 0) return order;
     return a[1] - b[1];
   });
-  return stabilizedThis.map(el => el[0]);
+  return stabilizedThis.map((el) => el[0]);
 }
 
 const headCells = [
@@ -53,17 +53,22 @@ const headCells = [
     id: "title",
     numeric: false,
     disablePadding: true,
-    label: "Tytuł"
+    label: "Tytuł",
   },
   { id: "author", numeric: false, disablePadding: false, label: "Autor" },
   { id: "format", numeric: false, disablePadding: false, label: "Format" },
   { id: "publisher", numeric: false, disablePadding: false, label: "Wydawca" },
-  { id: "library", numeric: false, disablePadding: false, label: "Biblioiteka" }
+  {
+    id: "library",
+    numeric: false,
+    disablePadding: false,
+    label: "Biblioiteka",
+  },
 ];
 
 function EnhancedTableHead(props) {
   const { classes, order, orderBy, rowCount, onRequestSort } = props;
-  const createSortHandler = property => event => {
+  const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
 
@@ -71,7 +76,7 @@ function EnhancedTableHead(props) {
     <TableHead>
       <TableRow>
         <TableCell padding="checkbox">{/* Tutaj były checkboxy */}</TableCell>
-        {headCells.map(headCell => (
+        {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
             align={headCell.numeric ? "right" : "left"}
@@ -102,20 +107,20 @@ EnhancedTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
   order: PropTypes.oneOf(["asc", "desc"]).isRequired,
   orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired
+  rowCount: PropTypes.number.isRequired,
 };
 
-const useToolbarStyles = makeStyles(theme => ({
+const useToolbarStyles = makeStyles((theme) => ({
   root: {
     paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(1)
+    paddingRight: theme.spacing(1),
   },
   title: {
-    flex: "1 1 100%"
-  }
+    flex: "1 1 100%",
+  },
 }));
 
-const EnhancedTableToolbar = props => {
+const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
 
   return (
@@ -137,16 +142,16 @@ const EnhancedTableToolbar = props => {
   );
 };
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
-    width: "100%"
+    width: "100%",
   },
   paper: {
     width: "100%",
-    marginBottom: theme.spacing(2)
+    marginBottom: theme.spacing(2),
   },
   table: {
-    minWidth: 750
+    minWidth: 750,
   },
   visuallyHidden: {
     border: 0,
@@ -157,8 +162,8 @@ const useStyles = makeStyles(theme => ({
     padding: 0,
     position: "absolute",
     top: 20,
-    width: 1
-  }
+    width: 1,
+  },
 }));
 
 export default function EnhancedTable() {
@@ -170,8 +175,8 @@ export default function EnhancedTable() {
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [rows, setRows] = useState([]);
-  const updateTable = useSelector(state => state.updateTable);
-  const dispatch = useDispatch()
+  const updateTable = useSelector((state) => state.updateTable);
+  const dispatch = useDispatch();
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -182,36 +187,36 @@ export default function EnhancedTable() {
   useEffect(() => {
     db.collection("books")
       .get()
-      .then(snapshot => {
+      .then((snapshot) => {
         let t = [];
-        snapshot.forEach(doc => {
-          t = [...t, {...doc.data(),id:doc.id}];
+        snapshot.forEach((doc) => {
+          t = [...t, { ...doc.data(), id: doc.id }];
         });
         setRows(t);
       });
   }, [updateTable]);
 
   const handleClick = (event) => {
-    const filtered = rows.filter((e)=>e.id === event.currentTarget.id)
+    const filtered = rows.filter((e) => e.id === event.currentTarget.id);
     dispatch({
       type: "OPEN_INFO_MODAL",
       payload: {
         open: true,
-        data: filtered[0]
-      }
-    })
+        data: filtered[0],
+      },
+    });
   };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = event => {
+  const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const handleChangeDense = event => {
+  const handleChangeDense = (event) => {
     setDense(event.target.checked);
   };
 
@@ -240,12 +245,12 @@ export default function EnhancedTable() {
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  console.log(row)
+                  console.log(row);
                   const labelId = `enhanced-table-checkbox-${index}`;
                   return (
                     <TableRow
                       hover
-                      onClick={event => handleClick(event, row.name)}
+                      onClick={(event) => handleClick(event, row.name)}
                       role="checkbox"
                       tabIndex={-1}
                       id={row.id}

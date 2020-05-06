@@ -23,6 +23,7 @@ import AddFile from "./AddFIle";
 import { categories } from "../assets/categories";
 import { firebaseStorage } from "../config";
 import { intialInfo } from "../reducers";
+import FormHelperText from "@material-ui/core/FormHelperText";
 
 export default function AddBookForm(props) {
   const useStyles = makeStyles((theme) => ({
@@ -153,7 +154,7 @@ export default function AddBookForm(props) {
         title: Yup.string().required("To pole jest wymagane"),
         author: Yup.string().required("To pole jest wymagane"),
         owner: Yup.string().required("To pole jest wymagane"),
-        genre: Yup.string().required("To pole jest wymagane"),
+        genre: Yup.string().nullable().required("To pole jest wymagane"),
         library: Yup.string().when("format", {
           is: (format) => format !== "ebook",
           then: Yup.string().required("To pole jest wymagane"),
@@ -166,7 +167,6 @@ export default function AddBookForm(props) {
           values,
           touched,
           errors,
-          dirty,
           isSubmitting,
           handleChange,
           handleBlur,
@@ -295,9 +295,9 @@ export default function AddBookForm(props) {
                             label="Kategoria"
                             margin="normal"
                             helperText={
-                              errors.owner && touched.owner && errors.owner
+                              errors.genre && touched.genre && errors.genre
                             }
-                            error={errors.owner && touched.owner}
+                            error={errors.genre && touched.genre}
                           />
                         )}
                       />
@@ -313,22 +313,16 @@ export default function AddBookForm(props) {
                       required
                       className={classes.formControl}
                       fullWidth
+                      error={errors.format && touched.format}
                     >
                       <InputLabel id="format-label">Format</InputLabel>
                       <Select
                         value={values.format}
-                        onChange={(e) => {
-                          handleChange(e);
-                          console.log((values.library = ""));
-                        }}
+                        onChange={handleChange}
                         labelId="format-label"
                         name="format"
                         className={classes.selectEmpty}
                         inputProps={{ "aria-label": "Without label" }}
-                        helperText={
-                          errors.format && touched.format && errors.format
-                        }
-                        error={errors.format && touched.format}
                       >
                         <MenuItem value="">
                           <em>Brak</em>
@@ -337,6 +331,9 @@ export default function AddBookForm(props) {
                         <MenuItem value={"książka"}>książka</MenuItem>
                         <MenuItem value={"czasopismo"}>czasopismo</MenuItem>
                       </Select>
+                      <FormHelperText error>
+                        {errors.format && touched.format && errors.format}
+                      </FormHelperText>
                     </FormControl>
                   </Grid>
 
@@ -351,6 +348,7 @@ export default function AddBookForm(props) {
                         className={classes.formControl}
                         fullWidth
                         disabled={values.format === "ebook" ? true : false}
+                        error={errors.library && touched.library}
                       >
                         <InputLabel id="library-label">Biblioteka</InputLabel>
                         <Select
@@ -360,10 +358,6 @@ export default function AddBookForm(props) {
                           name="library"
                           className={classes.selectEmpty}
                           inputProps={{ "aria-label": "Without label" }}
-                          helperText={
-                            errors.library && touched.library && errors.library
-                          }
-                          error={errors.library && touched.library}
                         >
                           <MenuItem value="">
                             <em>Brak</em>
@@ -374,6 +368,9 @@ export default function AddBookForm(props) {
                           <MenuItem value={"Zagórze"}>Zagórze</MenuItem>
                           <MenuItem value={"Rawa"}>Rawa</MenuItem>
                         </Select>
+                        <FormHelperText error>
+                          {errors.library && touched.library && errors.library}
+                        </FormHelperText>
                       </FormControl>
                     )}
                   </Grid>
