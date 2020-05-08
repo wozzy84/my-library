@@ -46,6 +46,10 @@ export default function FloatingActionButton(props) {
       type: "CLEAR_STORAGE",
       clear: false
     })  
+    dispatch({
+      type: "OPEN_ANY_MODAL",
+      open:true
+    })
   }
 
   return (

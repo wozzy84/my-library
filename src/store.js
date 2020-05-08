@@ -17,7 +17,8 @@ import {
   setReference,
   clearStorage,
   openInfoModal,
-  isEditing
+  isEditing,
+  openAnyModal
 } from "./reducers"
 
 //combineReducers
@@ -30,7 +31,9 @@ const reducers = combineReducers({
   reference:setReference,
   clearStorage: clearStorage,
   openInfoModal:openInfoModal,
-  isEditing: isEditing
+  isEditing: isEditing,
+  openAnyModal:openAnyModal
+
 
 })
 

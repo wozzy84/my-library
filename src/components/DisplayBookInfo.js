@@ -137,7 +137,7 @@ export default function DisplayBookInfo(props) {
                 <Typography>
                   {typeof data.date.toDate === "function"
                     ? data.date.toDate().getFullYear()
-                    : "brak"}
+                    : data.date.toString()}
                 </Typography>
                 <Typography variant="subtitle2">
                   <Box color="text.secondary">Data Wydania</Box>

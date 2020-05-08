@@ -4,102 +4,126 @@ import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { firebaseStorage } from "../config";
 import { useDispatch, useSelector } from "react-redux";
 import DeleteForeverOutlinedIcon from "@material-ui/icons/DeleteForeverOutlined";
 import { IconButton } from "@material-ui/core";
+import {  useSnackbar } from "notistack";
 
-
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     "& > *": {
-      margin: theme.spacing(1)
-    }
+      margin: theme.spacing(1),
+    },
   },
   input: {
-    display: "none"
+    display: "none",
   },
   LinearProgress: {
     width: "80%",
     "& > * + *": {
-      marginTop: theme.spacing(2)
-    }
+      marginTop: theme.spacing(2),
+    },
   },
   deleteButton: {
-    marginLeft: -10
+    marginLeft: -10,
   },
   progressField: {
-    postion: "relative"
+    postion: "relative",
   },
   addedFiles: {
     margin: theme.spacing(1),
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   fileName: {
-    
-    fontSize: 14 
-
-  }
+    fontSize: 14,
+    maxWidth: 300,
+  },
 }));
 
 export default function AddFile() {
+  const { enqueueSnackbar } = useSnackbar();
   const classes = useStyles();
   const [currentFile, setCurrentFile] = useState(null);
   const [progressValue, setProgressValue] = useState(0);
   const dispatch = useDispatch();
   const [completed, setCompleted] = useState(false);
-
-  const reference = useSelector(state => state.reference)
-  const clearStorage = useSelector(state=> state.clearStorage)
+  const [task, setTask] = useState(null);
+  const reference = useSelector((state) => state.reference);
+  const clearStorage = useSelector((state) => state.clearStorage);
+  const closeAnyModal = useSelector((state) => state.openAnyModal);
 
   const handleDelete = () => {
-    firebaseStorage.ref(reference).delete()
-    setCurrentFile(null)
-
+    task.cancel();
+    if (firebaseStorage.ref(reference)) {
+      firebaseStorage.ref(reference).delete();
+    }
+    setCurrentFile(null);
+    setProgressValue(0)
   };
 
-  const handleInputChange = e => {
-    setCurrentFile(e.target.files[0]);
-    dispatch({
-     type: "SET_REFERENCE",
-     reference:"images_pw/" + e.target.files[0].name  
-    });
-    const storageRef = firebaseStorage.ref("images_pw/" + e.target.files[0].name);
-    const uploadTask = storageRef.put(e.target.files[0]);
+  const handleInputChange = (e) => {
+    if (e.target.files) {
+      setCurrentFile(e.target.files[0]);
+      dispatch({
+        type: "SET_REFERENCE",
+        reference: "images_pw/" + e.target.files[0].name,
+      });
+    }
+  };
 
-    uploadTask.on(
-      "state_changed",
-      function progress(snapshot) {
-        let percentage =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setProgressValue(percentage);
-      },
-      function(error) {
-        console.log(error);
-      },
-      function() {
-        uploadTask.snapshot.ref.getDownloadURL().then(function(link) {
-          dispatch({
-            type: "DOWNLOAD_LINK",
-            link: link
+  useEffect(() => {
+    if (currentFile) {
+      let storageRef = firebaseStorage.ref("images_pw/" + currentFile.name);
+      let uploadTask = storageRef.put(currentFile);
+
+      uploadTask.on(
+        "state_changed",
+        function progress(snapshot) {
+          let percentage =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setProgressValue(percentage);
+          setTask(snapshot.task);
+        },
+        function (error) {
+          console.log(error);
+        },
+
+        function () {
+          uploadTask.snapshot.ref.getDownloadURL().then(function (link) {
+            dispatch({
+              type: "DOWNLOAD_LINK",
+              link: link,
+            });
           });
-        });
-        setCompleted(true)
-        if(clearStorage) {
-          firebaseStorage.ref(reference).delete()
+          setCompleted(true);
+          enqueueSnackbar("Plik został dodany do bazy", { variant: "success" });
+          if (clearStorage) {
+            firebaseStorage.ref(reference).delete();
+          }
         }
-      }
-    );
-  };
+      );
+    }
+  }, [currentFile]);
+
+  useEffect(() => {
+    if (!closeAnyModal && progressValue > 0 && progressValue < 100) {
+      
+      task.cancel();
+      enqueueSnackbar("Przerwano wczytywanie pliku do bazy", {
+        variant: "error",
+      });
+    }
+  }, [closeAnyModal]);
 
   return (
     <>
       <Grid item xs={12} sm={6}>
         <Typography variant="h6">Dodaj plik</Typography>
       </Grid>
-      <Grid xs={12}>
+      <Grid item xs={12}>
         <div className={classes.root}>
           <input
             accept="/.epub, .mobi"
@@ -115,23 +139,33 @@ export default function AddFile() {
           </label>
         </div>
       </Grid>
-      {currentFile &&
-             <Grid container xs={12} spacing={2} className={classes.addedFiles}>
-        <Grid item xs={12} sm={6} wrap="nowrap">
-          <Typography className={classes.fileName} noWrap>{currentFile ? currentFile.name : null}</Typography>
-        </Grid>
-        <Grid item xs={9} sm={5}>
-          <LinearProgress variant="determinate" value={progressValue} />
-        </Grid>
 
-        <Grid item xs={3} sm={1}>
-          <IconButton className={classes.deleteButton} onClick={handleDelete} disabled={completed?false:true}>
-            <DeleteForeverOutlinedIcon />
-          </IconButton>
+      {currentFile && (
+        <Grid
+          container
+          spacing={2}
+          className={classes.addedFiles}
+          wrap="nowrap"
+        >
+          <Grid item xs={12} sm={6} noWrap>
+            <Typography className={classes.fileName} noWrap>
+              {currentFile ? currentFile.name : null}
+            </Typography>
+          </Grid>
+          <Grid item xs={9} sm={5}>
+            <LinearProgress variant="determinate" value={progressValue} />
+          </Grid>
+          <Grid item xs={3} sm={1}>
+            <IconButton
+              className={classes.deleteButton}
+              onClick={handleDelete}
+              color="secondary"
+            >
+              <DeleteForeverOutlinedIcon />
+            </IconButton>
+          </Grid>
         </Grid>
-      </Grid> 
-      }
-
+      )}
     </>
   );
 }

@@ -64,15 +64,24 @@ export default function InfoNavigation() {
   const [value, setValue] = React.useState(0);
   const dispatch = useDispatch();
   const isEditing = useSelector((state) => state.isEditing);
+  const data = useSelector((state) => state.openInfoModal.data);
 
   const handleClick = () => {
     dispatch({
       type: "OPEN_INFO_MODAL",
       payload: {
         open: false,
-        data: intialInfo,
+        data: data,
       },
     });
+    dispatch({
+      type: "IS_EDITING",
+      edit: false,
+    });
+    dispatch({
+      type: "OPEN_ANY_MODAL",
+      open: false
+    })
   };
 
   const handleChange = (event, newValue) => {

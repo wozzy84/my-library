@@ -83,6 +83,16 @@ function openInfoModal (state={open:false, data:intialInfo}, action) {
     return state
   }
 }
+
+function openAnyModal (state=false, action) {
+  switch(action.type) {
+    case "OPEN_ANY_MODAL":
+      return action.open
+    default:
+      return state
+  }
+}
+
 function isEditing (state=false, action) {
   switch(action.type) {
     case "IS_EDITING":
@@ -101,5 +111,6 @@ export {
   setReference,
   clearStorage,
   openInfoModal,
-  isEditing
+  isEditing,
+  openAnyModal
 };

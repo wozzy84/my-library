@@ -129,9 +129,10 @@ export default function EditBookInfo(props) {
                 type: "OPEN_INFO_MODAL",
                 payload: {
                   open: true,
-                  data: { ...values, library: "ebook" },
+                  data: { ...values, library: "ebook", date: values.date.getFullYear() },
                 },
               });
+              console.log("Edytowane wartości", values)
             })
             .catch(function (error) {
               console.error("Error writing document: ", error);
@@ -147,7 +148,7 @@ export default function EditBookInfo(props) {
                 type: "OPEN_INFO_MODAL",
                 payload: {
                   open: true,
-                  data: values,
+                  data: {...values,date: values.date.getFullYear()}
                 },
               });
               console.log("Document successfully written!");
@@ -161,6 +162,7 @@ export default function EditBookInfo(props) {
                 type: "IS_EDITING",
                 edit: false,
               });
+              console.log("Edytowane wartości", values) 
             })
 
             .catch(function (error) {

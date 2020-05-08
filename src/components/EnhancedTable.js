@@ -205,6 +205,10 @@ export default function EnhancedTable() {
         data: filtered[0],
       },
     });
+    dispatch({
+      type: "OPEN_ANY_MODAL",
+      open: true
+    })
   };
 
   const handleChangePage = (event, newPage) => {

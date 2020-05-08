@@ -24,6 +24,7 @@ import { categories } from "../assets/categories";
 import { firebaseStorage } from "../config";
 import { intialInfo } from "../reducers";
 import FormHelperText from "@material-ui/core/FormHelperText";
+import { useSnackbar } from "notistack";
 
 export default function AddBookForm(props) {
   const useStyles = makeStyles((theme) => ({
@@ -73,7 +74,7 @@ export default function AddBookForm(props) {
   const downloadLink = useSelector((state) => state.downloadLink);
   const reference = useSelector((state) => state.reference);
   const classes = useStyles();
-
+  const { enqueueSnackbar } = useSnackbar();
   const genres = categories.sort();
 
   const defaultProps = {
@@ -93,6 +94,10 @@ export default function AddBookForm(props) {
         clear: true,
       });
     }
+    dispatch({
+      type: "OPEN_ANY_MODAL",
+      open: false,
+    });
   };
 
   return (
@@ -109,9 +114,13 @@ export default function AddBookForm(props) {
             .add({
               ...values,
               library: "ebook",
+              download: downloadLink,
+              reference: reference,
             })
             .then(function () {
-              console.log("Document successfully written!");
+              enqueueSnackbar("Ksiązka została dodana do bazy!", {
+                variant: "success",
+              });
               resetForm();
               setSubmitting(false);
               setSuccess(true);
@@ -128,12 +137,17 @@ export default function AddBookForm(props) {
               console.error("Error writing document: ", error);
               setSubmitting(false);
               setFailed(true);
+              enqueueSnackbar("Wystąpił błąd przy dodawaniu ksiązki", {
+                variant: "error",
+              });
             });
         } else {
           db.collection("books")
             .add(values)
             .then(function () {
-              console.log("Document successfully written!");
+              enqueueSnackbar("Ksiązka została dodana do bazy!", {
+                variant: "success",
+              });
               resetForm();
               setSubmitting(false);
               setSuccess(true);
@@ -146,6 +160,9 @@ export default function AddBookForm(props) {
               console.error("Error writing document: ", error);
               setSubmitting(false);
               setFailed(true);
+              enqueueSnackbar("Wystąpił błąd przy dodawaniu ksiązki", {
+                variant: "error",
+              });
             });
           setSubmitting(false);
         }
@@ -375,19 +392,6 @@ export default function AddBookForm(props) {
                     )}
                   </Grid>
                   {values.format === "ebook" && <AddFile />}
-
-                  <Grid item xs={12} sm={12}>
-                    {success && (
-                      <Alert severity="success">
-                        Udało Ci się dodać książkę do bazy
-                      </Alert>
-                    )}
-                    {failed && (
-                      <Alert severity="error">
-                        Wystąpił błąd podczas dodawania książki do bazy
-                      </Alert>
-                    )}
-                  </Grid>
                 </Grid>
                 <div className={classes.buttons}>
                   <Button
