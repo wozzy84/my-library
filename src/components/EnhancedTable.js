@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import clsx from "clsx";
 import { lighten, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -23,10 +22,25 @@ import { db } from "../config";
 import { useSelector, useDispatch } from "react-redux";
 
 function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
+  if (typeof a[orderBy] === "object") {
+    const sortedA = a[orderBy];
+    const sortedB = b[orderBy];
+    if (sortedB < sortedA) {
+      return -1;
+    }
+    if (sortedB > sortedA) {
+      return 1;
+    }
+    return 0;
+  }
+
+  const sortedA = a[orderBy].toString().toLowerCase().split(" ").join("");
+  const sortedB = b[orderBy].toString().toLowerCase().split(" ").join("");
+
+  if (sortedB.toString().toLowerCase() < sortedA.toString().toLowerCase()) {
     return -1;
   }
-  if (b[orderBy] > a[orderBy]) {
+  if (sortedB.toString().toLowerCase() > sortedA.toString().toLowerCase()) {
     return 1;
   }
   return 0;
@@ -57,7 +71,7 @@ const headCells = [
   },
   { id: "author", numeric: false, disablePadding: false, label: "Autor" },
   { id: "format", numeric: false, disablePadding: false, label: "Format" },
-  { id: "publisher", numeric: false, disablePadding: false, label: "Wydawca" },
+  { id: "date", numeric: false, disablePadding: false, label: "Data dodania" },
   {
     id: "library",
     numeric: false,
@@ -169,8 +183,7 @@ const useStyles = makeStyles((theme) => ({
 export default function EnhancedTable() {
   const classes = useStyles();
   const [order, setOrder] = React.useState("asc");
-  const [orderBy, setOrderBy] = React.useState("calories");
-
+  const [orderBy, setOrderBy] = React.useState("date");
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -207,8 +220,8 @@ export default function EnhancedTable() {
     });
     dispatch({
       type: "OPEN_ANY_MODAL",
-      open: true
-    })
+      open: true,
+    });
   };
 
   const handleChangePage = (event, newPage) => {
@@ -249,7 +262,6 @@ export default function EnhancedTable() {
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  console.log(row);
                   const labelId = `enhanced-table-checkbox-${index}`;
                   return (
                     <TableRow
@@ -273,7 +285,9 @@ export default function EnhancedTable() {
                       </TableCell>
                       <TableCell align="left">{row.author}</TableCell>
                       <TableCell align="left">{row.format}</TableCell>
-                      <TableCell align="left">{row.publisher}</TableCell>
+                      <TableCell align="left">
+                        {row.created.toDate().toLocaleString()}
+                      </TableCell>
                       <TableCell align="left">{row.library}</TableCell>
                     </TableRow>
                   );

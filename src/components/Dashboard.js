@@ -17,54 +17,55 @@ import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import { mainListItems, secondaryListItems } from "./listItems";
-
+import Autocomplete from "@material-ui/lab/Autocomplete";
 import Copyright from "./Copyright";
 import EnhancedTable from "./EnhancedTable";
 import ProfileCard from "./ProfileCard";
-import InputBase from '@material-ui/core/InputBase';
-import SearchIcon from '@material-ui/icons/Search';
-import { fade} from '@material-ui/core/styles';
-import {useDispatch} from 'react-redux'
-
+import InputBase from "@material-ui/core/InputBase";
+import SearchIcon from "@material-ui/icons/Search";
+import { fade } from "@material-ui/core/styles";
+import { useDispatch } from "react-redux";
+import TextField from "@material-ui/core/TextField";
+import { categories } from "../assets/categories";
 const drawerWidth = 240;
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
-    display: "flex"
+    display: "flex",
   },
   toolbar: {
-    paddingRight: 24 // keep right padding when drawer closed
+    paddingRight: 24, // keep right padding when drawer closed
   },
   toolbarIcon: {
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-end",
     padding: "0 8px",
-    ...theme.mixins.toolbar
+    ...theme.mixins.toolbar,
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })
+      duration: theme.transitions.duration.leavingScreen,
+    }),
   },
   appBarShift: {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })
+      duration: theme.transitions.duration.enteringScreen,
+    }),
   },
   menuButton: {
-    marginRight: 36
+    marginRight: 36,
   },
   menuButtonHidden: {
-    display: "none"
+    display: "none",
   },
   title: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   drawerPaper: {
     position: "relative",
@@ -72,76 +73,76 @@ const useStyles = makeStyles(theme => ({
     width: drawerWidth,
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })
+      duration: theme.transitions.duration.enteringScreen,
+    }),
   },
   drawerPaperClose: {
     overflowX: "hidden",
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
+      duration: theme.transitions.duration.leavingScreen,
     }),
     width: theme.spacing(7),
     [theme.breakpoints.up("sm")]: {
-      width: theme.spacing(9)
-    }
+      width: theme.spacing(9),
+    },
   },
   appBarSpacer: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
     height: "100vh",
-    overflow: "auto"
+    overflow: "auto",
   },
   container: {
     paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4)
+    paddingBottom: theme.spacing(4),
   },
   paper: {
     padding: theme.spacing(2),
     display: "flex",
     overflow: "auto",
-    flexDirection: "column"
+    flexDirection: "column",
   },
   fixedHeight: {
-    height: 240
+    height: 240,
   },
   search: {
-    position: 'relative',
+    position: "relative",
     borderRadius: theme.shape.borderRadius,
     backgroundColor: fade(theme.palette.common.white, 0.15),
-    '&:hover': {
+    "&:hover": {
       backgroundColor: fade(theme.palette.common.white, 0.25),
     },
     marginLeft: 0,
-    flexGrow:1,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
+    flexGrow: 1,
+    width: "100%",
+    [theme.breakpoints.up("sm")]: {
       marginLeft: theme.spacing(1),
-      width: 'auto',
+      width: "auto",
     },
   },
   searchIcon: {
     padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: "100%",
+    position: "absolute",
+    pointerEvents: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   inputRoot: {
-    color: 'inherit',
+    color: "inherit",
   },
   inputInput: {
     padding: theme.spacing(1, 1, 1, 0),
     // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      width: '22ch',
-      '&:focus': {
-        width: '50ch',
+    transition: theme.transitions.create("width"),
+    width: "100%",
+    [theme.breakpoints.up("sm")]: {
+      width: "22ch",
+      "&:focus": {
+        width: "50ch",
       },
     },
   },
@@ -149,7 +150,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function Dashboard() {
   const classes = useStyles();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(true);
   const [profileWasClicked, setProfileWasClicked] = useState(false);
 
@@ -157,22 +158,28 @@ export default function Dashboard() {
     setOpen(true);
     dispatch({
       type: "DRAWER_OPEN",
-      open: true
-    })
-
+      open: true,
+    });
   };
   const handleDrawerClose = () => {
     setOpen(false);
     dispatch({
       type: "DRAWER_OPEN",
-      open:false
-    })
+      open: false,
+    });
   };
   const handleProfileClick = () => {
     setProfileWasClicked(!profileWasClicked);
   };
-  const handleCloseProfileCard = val => {
+  const handleCloseProfileCard = (val) => {
     setProfileWasClicked(!val);
+  };
+
+  const genres = categories.sort()
+
+  const defaultProps = {
+    options: genres,
+    getOptionLabel: (option) => option,
   };
 
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
@@ -210,17 +217,39 @@ export default function Dashboard() {
             <div className={classes.searchIcon}>
               <SearchIcon />
             </div>
-            <InputBase
+            {/* <InputBase
               placeholder="Wyszukaj…"
               classes={{
                 root: classes.inputRoot,
                 input: classes.inputInput,
               }}
-              inputProps={{ 'aria-label': 'search' }}
-            />
+              inputProps={{ "aria-label": "search" }} */}
+            
+            <Autocomplete
+              {...defaultProps}
+              id="add-genre"
+              name="genre"
+              disableClearable
+              freeSolo
+              variant="contained"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput,
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Wyszukaj..."
+                  margin="normal"
+                 
+       
+                />
+              )}
+            ></Autocomplete>
+            {/* </InputBase> */}
           </div>
-          <IconButton color="inherit" onClick={handleProfileClick} >
-            <AccountCircleIcon/>
+          <IconButton color="inherit" onClick={handleProfileClick}>
+            <AccountCircleIcon />
           </IconButton>
         </Toolbar>
         <ProfileCard
@@ -232,7 +261,7 @@ export default function Dashboard() {
       <Drawer
         variant="permanent"
         classes={{
-          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)
+          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
         }}
         open={open}
       >

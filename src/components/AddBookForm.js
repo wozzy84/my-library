@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
@@ -15,7 +15,6 @@ import { Formik } from "formik";
 import { DatePicker } from "@material-ui/pickers";
 import * as Yup from "yup";
 import { IconButton } from "@material-ui/core";
-import Alert from "@material-ui/lab/Alert";
 import { db } from "../config";
 import { useDispatch, useSelector } from "react-redux";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -76,6 +75,15 @@ export default function AddBookForm(props) {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
   const genres = categories.sort();
+  const loggedUser = useSelector((state) => state.userReducer.email);
+  const [newDate, setNewDate] = useState(new Date())
+  const [clickSubmit, setClickSubmit] = useState(false)
+
+
+  useEffect(()=>{
+    setNewDate(new Date())
+    console.log("nOWA DATA", newDate)
+  },[clickSubmit])
 
   const defaultProps = {
     options: genres,
@@ -100,6 +108,8 @@ export default function AddBookForm(props) {
     });
   };
 
+
+  
   return (
     <Formik
       initialValues={{
@@ -107,8 +117,8 @@ export default function AddBookForm(props) {
         download: downloadLink,
         reference: reference,
       }}
-      onSubmit={(values, { resetForm, setSubmitting }) => {
-        console.log("values", values);
+      onSubmit={(values, {isSubmitting, resetForm, setSubmitting }) => {
+        setSubmitting(true)
         if (values.format === "ebook") {
           db.collection("books")
             .add({
@@ -116,13 +126,14 @@ export default function AddBookForm(props) {
               library: "ebook",
               download: downloadLink,
               reference: reference,
+              created: new Date(),
+              createdBy: loggedUser,
             })
             .then(function () {
               enqueueSnackbar("Ksiązka została dodana do bazy!", {
                 variant: "success",
               });
               resetForm();
-              setSubmitting(false);
               setSuccess(true);
               dispatch({
                 type: "TABLE_UPDATED",
@@ -135,7 +146,6 @@ export default function AddBookForm(props) {
 
             .catch(function (error) {
               console.error("Error writing document: ", error);
-              setSubmitting(false);
               setFailed(true);
               enqueueSnackbar("Wystąpił błąd przy dodawaniu ksiązki", {
                 variant: "error",
@@ -143,13 +153,12 @@ export default function AddBookForm(props) {
             });
         } else {
           db.collection("books")
-            .add(values)
+            .add({ ...values, created: new Date(), createdBy: loggedUser })
             .then(function () {
               enqueueSnackbar("Ksiązka została dodana do bazy!", {
                 variant: "success",
               });
               resetForm();
-              setSubmitting(false);
               setSuccess(true);
               dispatch({
                 type: "TABLE_UPDATED",
@@ -158,14 +167,13 @@ export default function AddBookForm(props) {
 
             .catch(function (error) {
               console.error("Error writing document: ", error);
-              setSubmitting(false);
               setFailed(true);
               enqueueSnackbar("Wystąpił błąd przy dodawaniu ksiązki", {
                 variant: "error",
               });
             });
-          setSubmitting(false);
         }
+     
       }}
       validationSchema={Yup.object().shape({
         title: Yup.string().required("To pole jest wymagane"),
@@ -400,6 +408,7 @@ export default function AddBookForm(props) {
                     variant="contained"
                     color="primary"
                     disabled={isSubmitting}
+
                   >
                     Dodaj
                   </Button>

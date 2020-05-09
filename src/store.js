@@ -34,7 +34,6 @@ const reducers = combineReducers({
   isEditing: isEditing,
   openAnyModal:openAnyModal
 
-
 })
 
 //store

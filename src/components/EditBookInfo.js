@@ -72,24 +72,11 @@ export default function EditBookInfo(props) {
   const reference = useSelector((state) => state.reference);
   const classes = useStyles();
   const genres = categories.sort();
+  const loggedUser = useSelector((state) => state.userReducer.email);
 
   const defaultProps = {
     options: genres,
     getOptionLabel: (option) => option,
-  };
-
-  const handleClick = () => {
-    dispatch({
-      type: "OPEN_ADD_MODAL",
-      open: false,
-    });
-    if (!success) {
-      firebaseStorage.ref(reference).delete();
-      dispatch({
-        type: "CLEAR_STORAGE",
-        clear: true,
-      });
-    }
   };
 
   return (
@@ -108,6 +95,7 @@ export default function EditBookInfo(props) {
             .set({
               ...values,
               library: "ebook",
+              lastModified: new Date(), lastModifiedBy: loggedUser
             })
             .then(function () {
               console.log("Document successfully written!");
@@ -129,7 +117,7 @@ export default function EditBookInfo(props) {
                 type: "OPEN_INFO_MODAL",
                 payload: {
                   open: true,
-                  data: { ...values, library: "ebook", date: values.date.getFullYear() },
+                  data: { ...values, library: "ebook", lastModified: new Date(), lastModifiedBy: loggedUser},
                 },
               });
               console.log("Edytowane wartości", values)
@@ -142,13 +130,13 @@ export default function EditBookInfo(props) {
         } else {
           db.collection("books")
             .doc(data.id)
-            .set(values)
+            .set({...values, lastModified: new Date(), lastModifiedBy: loggedUser})
             .then(function () {
               dispatch({
                 type: "OPEN_INFO_MODAL",
                 payload: {
                   open: true,
-                  data: {...values,date: values.date.getFullYear()}
+                  data: {...values,date: values.date.getFullYear(), lastModified: new Date()}
                 },
               });
               console.log("Document successfully written!");
