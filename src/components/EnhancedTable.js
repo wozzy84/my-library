@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { lighten, makeStyles } from "@material-ui/core/styles";
+import {  makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -81,7 +81,7 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-  const { classes, order, orderBy, rowCount, onRequestSort } = props;
+  const { classes, order, orderBy, onRequestSort } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -190,6 +190,8 @@ export default function EnhancedTable() {
   const [rows, setRows] = useState([]);
   const updateTable = useSelector((state) => state.updateTable);
   const dispatch = useDispatch();
+  const searchedItem = useSelector(state=> state.searchInputValue)
+  const data = useSelector(state => state.setData)
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -205,9 +207,22 @@ export default function EnhancedTable() {
         snapshot.forEach((doc) => {
           t = [...t, { ...doc.data(), id: doc.id }];
         });
-        setRows(t);
+        setRows(t)
+        dispatch({
+          type:"SET_DATA",
+          data: t
+        });
       });
-  }, [updateTable]);
+  }, [updateTable,dispatch]);
+
+  useEffect(()=>{
+    if(searchedItem.length) {
+      setRows(searchedItem)
+    }
+    else setRows(data)
+  },[searchedItem, data])
+
+
 
   const handleClick = (event) => {
     const filtered = rows.filter((e) => e.id === event.currentTarget.id);

@@ -6,7 +6,7 @@ import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
-import { deepOrange, deepPurple } from "@material-ui/core/colors";
+import { deepOrange } from "@material-ui/core/colors";
 import clsx from "clsx";
 import { auth } from "../config";
 import { useSelector, useDispatch } from "react-redux";

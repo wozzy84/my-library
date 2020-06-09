@@ -12,7 +12,6 @@ import CancelOutlinedIcon from "@material-ui/icons/CancelOutlined";
 import { IconButton } from "@material-ui/core";
 import DisplayBookInfo from "./DisplayBookInfo";
 import { useDispatch, useSelector } from "react-redux";
-import { intialInfo } from "../reducers";
 import Grid from "@material-ui/core/Grid";
 
 function TabPanel(props) {

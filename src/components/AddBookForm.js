@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
@@ -24,6 +24,7 @@ import { firebaseStorage } from "../config";
 import { intialInfo } from "../reducers";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import { useSnackbar } from "notistack";
+
 
 export default function AddBookForm(props) {
   const useStyles = makeStyles((theme) => ({
@@ -68,7 +69,6 @@ export default function AddBookForm(props) {
   }));
 
   const [success, setSuccess] = useState(false);
-  const [failed, setFailed] = useState(false);
   const dispatch = useDispatch();
   const downloadLink = useSelector((state) => state.downloadLink);
   const reference = useSelector((state) => state.reference);
@@ -76,14 +76,12 @@ export default function AddBookForm(props) {
   const { enqueueSnackbar } = useSnackbar();
   const genres = categories.sort();
   const loggedUser = useSelector((state) => state.userReducer.email);
-  const [newDate, setNewDate] = useState(new Date())
-  const [clickSubmit, setClickSubmit] = useState(false)
 
 
-  useEffect(()=>{
-    setNewDate(new Date())
-    console.log("nOWA DATA", newDate)
-  },[clickSubmit])
+  const uploadIsRunning = useSelector(state=> state.uploadIsRunning)
+
+
+  
 
   const defaultProps = {
     options: genres,
@@ -117,7 +115,7 @@ export default function AddBookForm(props) {
         download: downloadLink,
         reference: reference,
       }}
-      onSubmit={(values, {isSubmitting, resetForm, setSubmitting }) => {
+      onSubmit={(values, { resetForm, setSubmitting }) => {
         setSubmitting(true)
         if (values.format === "ebook") {
           db.collection("books")
@@ -146,7 +144,7 @@ export default function AddBookForm(props) {
 
             .catch(function (error) {
               console.error("Error writing document: ", error);
-              setFailed(true);
+            
               enqueueSnackbar("Wystąpił błąd przy dodawaniu ksiązki", {
                 variant: "error",
               });
@@ -167,7 +165,7 @@ export default function AddBookForm(props) {
 
             .catch(function (error) {
               console.error("Error writing document: ", error);
-              setFailed(true);
+           
               enqueueSnackbar("Wystąpił błąd przy dodawaniu ksiązki", {
                 variant: "error",
               });
@@ -407,8 +405,7 @@ export default function AddBookForm(props) {
                     className={classes.button}
                     variant="contained"
                     color="primary"
-                    disabled={isSubmitting}
-
+                    disabled={uploadIsRunning || isSubmitting}
                   >
                     Dodaj
                   </Button>

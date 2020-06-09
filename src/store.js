@@ -18,7 +18,12 @@ import {
   clearStorage,
   openInfoModal,
   isEditing,
-  openAnyModal
+  openAnyModal,
+  setData,
+  searchInputValue,
+  uploadIsRunning,
+
+  
 } from "./reducers"
 
 //combineReducers
@@ -32,7 +37,10 @@ const reducers = combineReducers({
   clearStorage: clearStorage,
   openInfoModal:openInfoModal,
   isEditing: isEditing,
-  openAnyModal:openAnyModal
+  openAnyModal:openAnyModal,
+  setData: setData,
+  searchInputValue:searchInputValue,
+  uploadIsRunning: uploadIsRunning
 
 })
 

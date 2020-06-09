@@ -4,7 +4,8 @@ import "firebase/firestore";
 import "firebase/functions";
 import "firebase/analytics"
 import 'firebase/storage'
-import React from "react";
+
+
 // Initialize Firebase
 
 var firebaseConfig = {

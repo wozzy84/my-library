@@ -15,6 +15,7 @@ import Link from "@material-ui/core/Link";
 import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import { firebaseStorage } from "../config";
 
+
 export default function DisplayBookInfo(props) {
   const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -135,9 +136,9 @@ export default function DisplayBookInfo(props) {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Typography>
-                  {typeof data.date.toDate === "function"
-                    ? data.date.toDate().getFullYear()
-                    : data.date.toString()}
+                  {
+                  data.date.toDate().getFullYear().toString()
+                  }
                 </Typography>
                 <Typography variant="subtitle2">
                   <Box color="text.secondary">Data Wydania</Box>

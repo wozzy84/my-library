@@ -17,11 +17,11 @@ import { db } from "../config";
 import { useDispatch, useSelector } from "react-redux";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import AddFile from "./AddFIle";
-import { firebaseStorage } from "../config";
 import SaveIcon from "@material-ui/icons/Save";
 import Fab from "@material-ui/core/Fab";
 import { categories } from "../assets/categories";
 import FormHelperText from "@material-ui/core/FormHelperText";
+import firebase from "firebase";
 
 export default function EditBookInfo(props) {
   const useStyles = makeStyles((theme) => ({
@@ -68,8 +68,6 @@ export default function EditBookInfo(props) {
   const [failed, setFailed] = useState(false);
   const dispatch = useDispatch();
   const data = useSelector((state) => state.openInfoModal.data);
-  const downloadLink = useSelector((state) => state.downloadLink);
-  const reference = useSelector((state) => state.reference);
   const classes = useStyles();
   const genres = categories.sort();
   const loggedUser = useSelector((state) => state.userReducer.email);
@@ -83,10 +81,7 @@ export default function EditBookInfo(props) {
     <Formik
       initialValues={{
         ...data,
-        date:
-          typeof data.date.toDate === "function"
-            ? data.date.toDate()
-            : data.date,
+        date: data.date.toDate()
       }}
       onSubmit={(values, { resetForm, setSubmitting }) => {
         if (values.format === "ebook") {
@@ -95,7 +90,8 @@ export default function EditBookInfo(props) {
             .set({
               ...values,
               library: "ebook",
-              lastModified: new Date(), lastModifiedBy: loggedUser
+              lastModified: new Date(),
+              lastModifiedBy: loggedUser,
             })
             .then(function () {
               console.log("Document successfully written!");
@@ -117,10 +113,17 @@ export default function EditBookInfo(props) {
                 type: "OPEN_INFO_MODAL",
                 payload: {
                   open: true,
-                  data: { ...values, library: "ebook", lastModified: new Date(), lastModifiedBy: loggedUser},
+                  data: {
+                    ...values,
+                    library: "ebook",
+                    date: new firebase.firestore.Timestamp.fromDate(
+                      values.date
+                    ),
+                    lastModified: new Date(),
+                    lastModifiedBy: loggedUser,
+                  },
                 },
               });
-              console.log("Edytowane wartości", values)
             })
             .catch(function (error) {
               console.error("Error writing document: ", error);
@@ -130,13 +133,24 @@ export default function EditBookInfo(props) {
         } else {
           db.collection("books")
             .doc(data.id)
-            .set({...values, lastModified: new Date(), lastModifiedBy: loggedUser})
+            .set({
+              ...values,
+              lastModified: new Date(),
+              lastModifiedBy: loggedUser,
+            })
             .then(function () {
               dispatch({
                 type: "OPEN_INFO_MODAL",
                 payload: {
                   open: true,
-                  data: {...values,date: values.date.getFullYear(), lastModified: new Date()}
+                  data: {
+                    ...values,
+                    date: new firebase.firestore.Timestamp.fromDate(
+                      values.date
+                    ),
+                    lastModified: new Date(),
+                    lastModifiedBy: loggedUser,
+                  },
                 },
               });
               console.log("Document successfully written!");
@@ -150,7 +164,7 @@ export default function EditBookInfo(props) {
                 type: "IS_EDITING",
                 edit: false,
               });
-              console.log("Edytowane wartości", values) 
+            
             })
 
             .catch(function (error) {
@@ -178,7 +192,6 @@ export default function EditBookInfo(props) {
           values,
           touched,
           errors,
-          isSubmitting,
           handleChange,
           handleBlur,
           handleSubmit,

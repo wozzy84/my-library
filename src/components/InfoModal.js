@@ -4,12 +4,7 @@ import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import { useSelector, useDispatch } from "react-redux";
-import Grid from "@material-ui/core/Grid";
-import CancelIcon from "@material-ui/icons/Cancel";
-import { IconButton } from "@material-ui/core";
-import EditBookInfo from "./EditBookInfo";
+import { useSelector } from "react-redux";
 import InfoNavigation from "./InfoNavigation";
 
 const useStyles = makeStyles(theme => ({

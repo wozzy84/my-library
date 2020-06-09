@@ -101,6 +101,31 @@ function isEditing (state=false, action) {
       return state
   }
 }
+function setData (state=[], action) {
+  switch(action.type) {
+    case "SET_DATA":
+      return action.data
+    default:
+      return state
+  }
+}
+
+function searchInputValue (state=[], action) {
+  switch(action.type) {
+    case "SEARCH_INPUT_VALUE":
+      return action.value 
+    default: 
+    return state
+  }
+}
+function uploadIsRunning (state=false, action) {
+  switch(action.type) {
+    case "UPLOAD_IS_RUNNING":
+      return action.run
+    default:
+      return state
+  }
+}
 
 export {
   userReducer,
@@ -112,5 +137,8 @@ export {
   clearStorage,
   openInfoModal,
   isEditing,
-  openAnyModal
+  openAnyModal,
+  setData,
+  searchInputValue,
+  uploadIsRunning
 };

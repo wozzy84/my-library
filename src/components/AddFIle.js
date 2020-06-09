@@ -9,7 +9,7 @@ import { firebaseStorage } from "../config";
 import { useDispatch, useSelector } from "react-redux";
 import DeleteForeverOutlinedIcon from "@material-ui/icons/DeleteForeverOutlined";
 import { IconButton } from "@material-ui/core";
-import {  useSnackbar } from "notistack";
+import { useSnackbar } from "notistack";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,19 +49,30 @@ export default function AddFile() {
   const [currentFile, setCurrentFile] = useState(null);
   const [progressValue, setProgressValue] = useState(0);
   const dispatch = useDispatch();
-  const [completed, setCompleted] = useState(false);
   const [task, setTask] = useState(null);
   const reference = useSelector((state) => state.reference);
   const clearStorage = useSelector((state) => state.clearStorage);
   const closeAnyModal = useSelector((state) => state.openAnyModal);
+  const data = useSelector((state) => state.openInfoModal.data);
 
   const handleDelete = () => {
-    task.cancel();
-    if (firebaseStorage.ref(reference)) {
+    if (task) {
+      task.cancel();
+    }
+    if (data.reference && data.reference.length) {
+      firebaseStorage.ref(data.reference).delete();
+      dispatch({
+        type: "OPEN_INFO_MODAL",
+        payload: {
+          open: true,
+          data: { ...data, download: "", reference: "" },
+        },
+      });
+    } else if (firebaseStorage.ref(reference)) {
       firebaseStorage.ref(reference).delete();
     }
     setCurrentFile(null);
-    setProgressValue(0)
+    setProgressValue(0);
   };
 
   const handleInputChange = (e) => {
@@ -78,7 +89,6 @@ export default function AddFile() {
     if (currentFile) {
       let storageRef = firebaseStorage.ref("images_pw/" + currentFile.name);
       let uploadTask = storageRef.put(currentFile);
-
       uploadTask.on(
         "state_changed",
         function progress(snapshot) {
@@ -86,9 +96,27 @@ export default function AddFile() {
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProgressValue(percentage);
           setTask(snapshot.task);
+
+          switch (snapshot.state) {
+            case "running":
+              dispatch({
+                type: "UPLOAD_IS_RUNNING",
+                run: true,
+              });
+              break;
+            default:
+              dispatch({
+                type: "UPLOAD_IS_RUNNING",
+                run: false,
+              });
+          }
         },
         function (error) {
           console.log(error);
+          dispatch({
+            type: "UPLOAD_IS_RUNNING",
+            run: false,
+          });
         },
 
         function () {
@@ -98,26 +126,77 @@ export default function AddFile() {
               link: link,
             });
           });
-          setCompleted(true);
+
           enqueueSnackbar("Plik został dodany do bazy", { variant: "success" });
           if (clearStorage) {
             firebaseStorage.ref(reference).delete();
           }
+          dispatch({
+            type: "UPLOAD_IS_RUNNING",
+            run: false,
+          });
         }
       );
     }
-  }, [currentFile]);
+  }, [currentFile, clearStorage, dispatch, enqueueSnackbar, reference]);
 
   useEffect(() => {
     if (!closeAnyModal && progressValue > 0 && progressValue < 100) {
-      
       task.cancel();
       enqueueSnackbar("Przerwano wczytywanie pliku do bazy", {
         variant: "error",
       });
     }
-  }, [closeAnyModal]);
+  }, [closeAnyModal, enqueueSnackbar, progressValue, task]);
 
+  if (data.download && data.download.length) {
+    return (
+      <>
+        <Grid item xs={12} sm={6}>
+          <Typography variant="h6">Dodaj plik</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <div className={classes.root}>
+            <input
+              accept="/.epub, .mobi"
+              className={classes.input}
+              id="contained-button-file"
+              type="file"
+              onChange={handleInputChange}
+            />
+            <label htmlFor="contained-button-file">
+              <Button variant="contained" component="span">
+                Załaduj
+              </Button>
+            </label>
+          </div>
+        </Grid>
+
+        <Grid container spacing={2} className={classes.addedFiles}>
+          <Grid item xs={12} sm={6}>
+            <Typography className={classes.fileName} noWrap={true}>
+              {data.reference.slice(
+                data.reference.indexOf("/") + 1,
+                data.reference.length
+              )}
+            </Typography>
+          </Grid>
+          <Grid item xs={9} sm={5}>
+            <LinearProgress variant="determinate" value={100} />
+          </Grid>
+          <Grid item xs={3} sm={1}>
+            <IconButton
+              className={classes.deleteButton}
+              onClick={handleDelete}
+              color="secondary"
+            >
+              <DeleteForeverOutlinedIcon />
+            </IconButton>
+          </Grid>
+        </Grid>
+      </>
+    );
+  }
   return (
     <>
       <Grid item xs={12} sm={6}>
@@ -141,14 +220,9 @@ export default function AddFile() {
       </Grid>
 
       {currentFile && (
-        <Grid
-          container
-          spacing={2}
-          className={classes.addedFiles}
-          wrap="nowrap"
-        >
-          <Grid item xs={12} sm={6} noWrap>
-            <Typography className={classes.fileName} noWrap>
+        <Grid container spacing={2} className={classes.addedFiles}>
+          <Grid item xs={12} sm={6}>
+            <Typography className={classes.fileName} noWrap={true}>
               {currentFile ? currentFile.name : null}
             </Typography>
           </Grid>
