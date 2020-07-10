@@ -81,7 +81,7 @@ export default function EditBookInfo(props) {
     <Formik
       initialValues={{
         ...data,
-        date: data.date.toDate()
+        date: data.date.toDate(),
       }}
       onSubmit={(values, { resetForm, setSubmitting }) => {
         if (values.format === "ebook") {
@@ -89,6 +89,8 @@ export default function EditBookInfo(props) {
             .doc(data.id)
             .set({
               ...values,
+              download: data.download,
+              reference: data.reference,
               library: "ebook",
               lastModified: new Date(),
               lastModifiedBy: loggedUser,
@@ -115,6 +117,8 @@ export default function EditBookInfo(props) {
                   open: true,
                   data: {
                     ...values,
+                    download: data.download,
+                    reference: data.reference,
                     library: "ebook",
                     date: new firebase.firestore.Timestamp.fromDate(
                       values.date
@@ -164,7 +168,6 @@ export default function EditBookInfo(props) {
                 type: "IS_EDITING",
                 edit: false,
               });
-            
             })
 
             .catch(function (error) {
@@ -343,7 +346,7 @@ export default function EditBookInfo(props) {
                         className={classes.selectEmpty}
                         inputProps={{ "aria-label": "Without label" }}
                       >
-                        <MenuItem value="">
+                        <MenuItem>
                           <em>Brak</em>
                         </MenuItem>
                         <MenuItem value={"ebook"}>ebook</MenuItem>
@@ -394,7 +397,6 @@ export default function EditBookInfo(props) {
                     )}
                   </Grid>
                   {values.format === "ebook" && <AddFile />}
-
                   <Grid item xs={12} sm={12}>
                     {success && (
                       <Alert severity="success">

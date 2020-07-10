@@ -25,7 +25,6 @@ import { intialInfo } from "../reducers";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import { useSnackbar } from "notistack";
 
-
 export default function AddBookForm(props) {
   const useStyles = makeStyles((theme) => ({
     layout: {
@@ -77,11 +76,7 @@ export default function AddBookForm(props) {
   const genres = categories.sort();
   const loggedUser = useSelector((state) => state.userReducer.email);
 
-
-  const uploadIsRunning = useSelector(state=> state.uploadIsRunning)
-
-
-  
+  const uploadIsRunning = useSelector((state) => state.uploadIsRunning);
 
   const defaultProps = {
     options: genres,
@@ -106,8 +101,6 @@ export default function AddBookForm(props) {
     });
   };
 
-
-  
   return (
     <Formik
       initialValues={{
@@ -116,7 +109,7 @@ export default function AddBookForm(props) {
         reference: reference,
       }}
       onSubmit={(values, { resetForm, setSubmitting }) => {
-        setSubmitting(true)
+        setSubmitting(true);
         if (values.format === "ebook") {
           db.collection("books")
             .add({
@@ -144,7 +137,7 @@ export default function AddBookForm(props) {
 
             .catch(function (error) {
               console.error("Error writing document: ", error);
-            
+
               enqueueSnackbar("Wystąpił błąd przy dodawaniu ksiązki", {
                 variant: "error",
               });
@@ -165,13 +158,12 @@ export default function AddBookForm(props) {
 
             .catch(function (error) {
               console.error("Error writing document: ", error);
-           
+
               enqueueSnackbar("Wystąpił błąd przy dodawaniu ksiązki", {
                 variant: "error",
               });
             });
         }
-     
       }}
       validationSchema={Yup.object().shape({
         title: Yup.string().required("To pole jest wymagane"),
@@ -347,7 +339,7 @@ export default function AddBookForm(props) {
                         className={classes.selectEmpty}
                         inputProps={{ "aria-label": "Without label" }}
                       >
-                        <MenuItem value="">
+                        <MenuItem>
                           <em>Brak</em>
                         </MenuItem>
                         <MenuItem value={"ebook"}>ebook</MenuItem>
@@ -382,7 +374,7 @@ export default function AddBookForm(props) {
                           className={classes.selectEmpty}
                           inputProps={{ "aria-label": "Without label" }}
                         >
-                          <MenuItem value="">
+                          <MenuItem>
                             <em>Brak</em>
                           </MenuItem>
                           <MenuItem value={"Popiełuszki"}>Popiełuszki</MenuItem>

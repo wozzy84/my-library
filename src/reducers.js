@@ -1,5 +1,5 @@
 export const intialInfo = {
-  title:"",
+  title: "",
   author:"",
   publisher: "",
   date: new Date(),
@@ -8,6 +8,7 @@ export const intialInfo = {
   genre: "",
   format:"",
   download: "",
+  reference: ""
 }
 
 

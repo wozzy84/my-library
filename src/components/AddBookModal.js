@@ -8,31 +8,29 @@ import Paper from "@material-ui/core/Paper";
 import { useSelector } from "react-redux";
 import AddBookForm from "./AddBookForm";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   modal: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-
   },
   root: {
     overflowY: "auto",
     display: "flex",
     flexWrap: "wrap",
-    outline:"none",
+    outline: "none",
     maxHeight: "100vh",
     "& > *": {
       // margin: theme.spacing(1),
       // width: theme.spacing(100),
       // height: theme.spacing(100)
-    }
-  }
+    },
+  },
 }));
 
 export default function AddBookModal() {
   const classes = useStyles();
-  const openAddModal = useSelector(state => state.openAddModal);
-
+  const openAddModal = useSelector((state) => state.openAddModal);
 
   return (
     <div>
@@ -44,15 +42,14 @@ export default function AddBookModal() {
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
-          timeout: 500
+          timeout: 500,
         }}
       >
         <Fade in={openAddModal}>
           <div className={classes.root}>
-            <Paper elevation={3} >
-        <AddBookForm/>
-
-            </Paper>   
+            <Paper elevation={3}>
+              <AddBookForm />
+            </Paper>
           </div>
         </Fade>
       </Modal>

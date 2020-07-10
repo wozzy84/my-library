@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import DeleteForeverOutlinedIcon from "@material-ui/icons/DeleteForeverOutlined";
 import { IconButton } from "@material-ui/core";
 import { useSnackbar } from "notistack";
+import { db } from "../config";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -68,6 +69,14 @@ export default function AddFile() {
           data: { ...data, download: "", reference: "" },
         },
       });
+      dispatch({
+        type: "DOWNLOAD_LINK",
+        link: "",
+      });
+      db.collection("books").doc(data.id).update({
+        download: "",
+        reference: "",
+      });
     } else if (firebaseStorage.ref(reference)) {
       firebaseStorage.ref(reference).delete();
     }
@@ -86,7 +95,7 @@ export default function AddFile() {
   };
 
   useEffect(() => {
-    if (currentFile) {
+    if (currentFile && data.download == "") {
       let storageRef = firebaseStorage.ref("images_pw/" + currentFile.name);
       let uploadTask = storageRef.put(currentFile);
       uploadTask.on(
@@ -124,6 +133,14 @@ export default function AddFile() {
             dispatch({
               type: "DOWNLOAD_LINK",
               link: link,
+            });
+
+            dispatch({
+              type: "OPEN_INFO_MODAL",
+              payload: {
+                open: true,
+                data: { ...data, download: link, reference: reference },
+              },
             });
           });
 
