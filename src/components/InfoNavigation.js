@@ -100,7 +100,7 @@ export default function InfoNavigation() {
               aria-label="scrollable prevent tabs example"
             >
               <Tab icon={<Info />} aria-label="phone" {...a11yProps(0)} />
-              <Tab icon={<Star />} aria-label="favorite" {...a11yProps(1)} />
+              {/* <Tab icon={<Star />} aria-label="favorite" {...a11yProps(1)} /> */}
             </Tabs>
           </Grid>
         </Grid>

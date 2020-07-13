@@ -5,6 +5,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
+import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
@@ -16,7 +17,8 @@ import { Formik } from "formik";
 import { useState } from "react";
 import * as Yup from "yup";
 import { auth } from "../config";
-import {Link} from 'react-router-dom'
+import { useSnackbar } from "notistack";
+
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -38,9 +40,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignIn() {
+export default function ResetPsswd() {
   const classes = useStyles();
-  const [isSubmitionCompleted, setSubmitionCompleted] = useState(false);
+ 
+  const { enqueueSnackbar } = useSnackbar();
 
 
   return (
@@ -52,31 +55,37 @@ export default function SignIn() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Zaloguj się
+            Resetuj hasło
           </Typography>
-          {!isSubmitionCompleted && (
+          
             <React.Fragment>
               <Formik
-                initialValues={{ email: "", password: "" }}
+                initialValues={{ email: "" }}
                 onSubmit={(values, { setSubmitting, resetForm }) => {
                   setSubmitting(true);
                   auth
-                    .signInWithEmailAndPassword(values.email, values.password)
-                    .then((cred) => {
-                      console.log(cred.user.email);
-                      setSubmitionCompleted(true);
+                    .sendPasswordResetEmail(values.email)
+                    .then(() => {
+                      console.log("sukces");
+                      enqueueSnackbar("Sukces! Na podany adres email wysłano link do zmimany hasła", {
+                        variant: "success",
+                      });
                       resetForm();
                     })
-                    .catch(function (error) {
-                      console.error(error.code, error.message);
+
+                    .catch((error) => {
+                      enqueueSnackbar("Błąd. Podano niewłaściwy adres email", {
+                        variant: "error",
+                      });
+                      console.log(error);
+                      setSubmitting(false)
+                      resetForm()
                     });
                 }}
                 validationSchema={Yup.object().shape({
                   email: Yup.string()
                     .email("niepoprawny format email")
                     .required("To pole jest wymagane"),
-                  password: Yup.string().required("To pole jest wymagane"),
-                  // .min(6, "Hasło powinno mieć min. 6 znaków")
                 })}
               >
                 {(props) => {
@@ -84,7 +93,6 @@ export default function SignIn() {
                     values,
                     touched,
                     errors,
-
                     isSubmitting,
                     handleChange,
                     handleBlur,
@@ -110,33 +118,6 @@ export default function SignIn() {
                         error={errors.email && touched.email}
                         autoFocus
                       />
-                      <TextField
-                        variant="outlined"
-                        margin="normal"
-                        fullWidth
-                        name="password"
-                        label="Hasło"
-                        type="password"
-                        id="password"
-                        autoComplete="current-password"
-                        value={values.password}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        helperText={
-                          errors.password && touched.password && errors.password
-                        }
-                        error={errors.password && touched.password}
-                      />
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            value="remember"
-                            color="primary"
-                            onChange={(e) => console.log(e.currentTarget.value)}
-                          />
-                        }
-                        label="Zapamiętaj mnie"
-                      />
                       <Button
                         type="submit"
                         fullWidth
@@ -145,21 +126,14 @@ export default function SignIn() {
                         className={classes.submit}
                         disabled={isSubmitting}
                       >
-                        Zaloguj
+                        Wyślij
                       </Button>
-                      <Grid container>
-                        <Grid item xs>
-                          <Link to="/reset" variant="body2" >
-                            Zapomniałeś hasła?
-                          </Link>
-                        </Grid>
-                      </Grid>
                     </form>
                   );
                 }}
               </Formik>
             </React.Fragment>
-          )}
+          
         </div>
         <Box mt={8}>
           <Copyright />
