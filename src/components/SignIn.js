@@ -16,7 +16,8 @@ import { Formik } from "formik";
 import { useState } from "react";
 import * as Yup from "yup";
 import { auth } from "../config";
-import {Link} from 'react-router-dom'
+import { Link } from "react-router-dom";
+import { useSnackbar } from "notistack";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -40,8 +41,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignIn() {
   const classes = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
   const [isSubmitionCompleted, setSubmitionCompleted] = useState(false);
-
 
   return (
     <React.Fragment>
@@ -69,6 +70,9 @@ export default function SignIn() {
                     })
                     .catch(function (error) {
                       console.error(error.code, error.message);
+                      resetForm();
+                      enqueueSnackbar("Błąd logowania. Nieprawidłowy email lub hasło.", { variant: "error" })
+                      setSubmitting(false);
                     });
                 }}
                 validationSchema={Yup.object().shape({
@@ -148,7 +152,7 @@ export default function SignIn() {
                       </Button>
                       <Grid container>
                         <Grid item xs>
-                          <Link to="/reset" variant="body2" >
+                          <Link to="/reset" variant="body2">
                             Zapomniałeś hasła?
                           </Link>
                         </Grid>
