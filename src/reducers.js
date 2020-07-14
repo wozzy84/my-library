@@ -12,7 +12,7 @@ export const intialInfo = {
 }
 
 
-function userReducer(state = {}, action) {
+function userReducer(state = {user:{uid:false}}, action) {
   switch (action.type) {
     case "LOGGED_USER":
       return action.user;
