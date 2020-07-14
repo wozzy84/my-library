@@ -54,6 +54,7 @@ export default function AddFile() {
   const reference = useSelector((state) => state.reference);
   const clearStorage = useSelector((state) => state.clearStorage);
   const closeAnyModal = useSelector((state) => state.openAnyModal);
+  const isInfoModalOpened = useSelector((state) => state.openInfoModal.open);
   const data = useSelector((state) => state.openInfoModal.data);
 
   const handleDelete = () => {
@@ -134,14 +135,23 @@ export default function AddFile() {
               type: "DOWNLOAD_LINK",
               link: link,
             });
-
-            dispatch({
-              type: "OPEN_INFO_MODAL",
-              payload: {
-                open: true,
-                data: { ...data, download: link, reference: reference },
-              },
-            });
+            if (isInfoModalOpened) {
+              dispatch({
+                type: "OPEN_INFO_MODAL",
+                payload: {
+                  open: true,
+                  data: { ...data, download: link, reference: reference },
+                },
+              });
+            } else {
+              dispatch({
+                type: "OPEN_INFO_MODAL",
+                payload: {
+                  open: false,
+                  data: { ...data, download: link, reference: reference },
+                },
+              });
+            }
           });
 
           enqueueSnackbar("Plik został dodany do bazy", { variant: "success" });

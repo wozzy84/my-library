@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "roguz-library",
+    "roguz-lib": "roguz-library"
+  }
+}
