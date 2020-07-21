@@ -1,18 +1,17 @@
 export const intialInfo = {
   title: "",
-  author:"",
+  author: "",
   publisher: "",
   date: new Date(),
-  owner:"",
-  library:"",
+  owner: "",
+  library: "",
   genre: "",
-  format:"",
+  format: "",
   download: "",
-  reference: ""
-}
+  reference: "",
+};
 
-
-function userReducer(state = {user:{uid:false}}, action) {
+function userReducer(state = { user: { uid: false } }, action) {
   switch (action.type) {
     case "LOGGED_USER":
       return action.user;
@@ -67,7 +66,7 @@ function setReference(state = "", action) {
   }
 }
 
-function clearStorage (state = false, action) {
+function clearStorage(state = false, action) {
   switch (action.type) {
     case "CLEAR_STORAGE":
       return action.clear;
@@ -76,55 +75,65 @@ function clearStorage (state = false, action) {
   }
 }
 
-function openInfoModal (state={open:false, data:intialInfo}, action) {
-  switch(action.type) {
+function openInfoModal(state = { open: false, data: intialInfo }, action) {
+  switch (action.type) {
     case "OPEN_INFO_MODAL":
-      return action.payload
-    default: 
-    return state
+      return action.payload;
+    default:
+      return state;
   }
 }
 
-function openAnyModal (state=false, action) {
-  switch(action.type) {
+function openAnyModal(state = false, action) {
+  switch (action.type) {
     case "OPEN_ANY_MODAL":
-      return action.open
+      return action.open;
     default:
-      return state
+      return state;
   }
 }
 
-function isEditing (state=false, action) {
-  switch(action.type) {
+function isEditing(state = false, action) {
+  switch (action.type) {
     case "IS_EDITING":
-      return action.edit
-      default: 
-      return state
+      return action.edit;
+    default:
+      return state;
   }
 }
-function setData (state=[], action) {
-  switch(action.type) {
+function setData(state = [], action) {
+  switch (action.type) {
     case "SET_DATA":
-      return action.data
+      return action.data;
     default:
-      return state
+      return state;
   }
 }
 
-function searchInputValue (state=[], action) {
-  switch(action.type) {
+function searchInputValue(state = [], action) {
+  switch (action.type) {
     case "SEARCH_INPUT_VALUE":
-      return action.value 
-    default: 
-    return state
+      return action.value;
+    default:
+      return state;
   }
 }
-function uploadIsRunning (state=false, action) {
-  switch(action.type) {
+function uploadIsRunning(state = false, action) {
+  switch (action.type) {
     case "UPLOAD_IS_RUNNING":
-      return action.run
+      return action.run;
     default:
-      return state
+      return state;
+  }
+}
+
+function getCsv(state = "", action) {
+  switch (action.type) {
+    case "SET_CSV":
+      return action.csv;
+
+    default:
+      return state;
   }
 }
 
@@ -141,5 +150,6 @@ export {
   openAnyModal,
   setData,
   searchInputValue,
-  uploadIsRunning
+  uploadIsRunning,
+  getCsv
 };

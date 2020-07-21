@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import {  makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -20,6 +20,9 @@ import FilterListIcon from "@material-ui/icons/FilterList";
 import { useEffect, useState } from "react";
 import { db } from "../config";
 import { useSelector, useDispatch } from "react-redux";
+import { CsvGenerate } from "./listItems";
+
+
 
 function descendingComparator(a, b, orderBy) {
   if (typeof a[orderBy] === "object") {
@@ -147,6 +150,7 @@ const EnhancedTableToolbar = (props) => {
       >
         Lista tytułów
       </Typography>
+     
       <Tooltip title="Filter list">
         <IconButton aria-label="filter list">
           <FilterListIcon />
@@ -190,9 +194,9 @@ export default function EnhancedTable() {
   const [rows, setRows] = useState([]);
   const updateTable = useSelector((state) => state.updateTable);
   const dispatch = useDispatch();
-  const searchedItem = useSelector(state=> state.searchInputValue)
-  const data = useSelector(state => state.setData)
-
+  const searchedItem = useSelector((state) => state.searchInputValue);
+  const data = useSelector((state) => state.setData);
+  const [csv, setCsv] = useState()
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
@@ -207,22 +211,19 @@ export default function EnhancedTable() {
         snapshot.forEach((doc) => {
           t = [...t, { ...doc.data(), id: doc.id }];
         });
-        setRows(t)
+        setRows(t);     
         dispatch({
-          type:"SET_DATA",
-          data: t
+          type: "SET_DATA",
+          data: t,
         });
       });
-  }, [updateTable,dispatch]);
+  }, [updateTable, dispatch]);
 
-  useEffect(()=>{
-    if(searchedItem.length) {
-      setRows(searchedItem)
-    }
-    else setRows(data)
-  },[searchedItem, data])
-
-
+  useEffect(() => {
+    if (searchedItem.length) {
+      setRows(searchedItem);
+    } else setRows(data);
+  }, [searchedItem, data]);
 
   const handleClick = (event) => {
     const filtered = rows.filter((e) => e.id === event.currentTarget.id);
@@ -329,6 +330,7 @@ export default function EnhancedTable() {
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
       />
+       
     </div>
   );
 }

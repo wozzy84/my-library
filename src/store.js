@@ -22,6 +22,7 @@ import {
   setData,
   searchInputValue,
   uploadIsRunning,
+  getCsv
 
   
 } from "./reducers"
@@ -40,7 +41,8 @@ const reducers = combineReducers({
   openAnyModal:openAnyModal,
   setData: setData,
   searchInputValue:searchInputValue,
-  uploadIsRunning: uploadIsRunning
+  uploadIsRunning: uploadIsRunning,
+  getCsv:getCsv
 
 })
 
