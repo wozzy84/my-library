@@ -22,8 +22,6 @@ import { db } from "../config";
 import { useSelector, useDispatch } from "react-redux";
 import { CsvGenerate } from "./listItems";
 
-
-
 function descendingComparator(a, b, orderBy) {
   if (typeof a[orderBy] === "object") {
     const sortedA = a[orderBy];
@@ -91,7 +89,7 @@ function EnhancedTableHead(props) {
 
   return (
     <TableHead>
-      <TableRow>
+      <TableRow >
         <TableCell padding="checkbox">{/* Tutaj były checkboxy */}</TableCell>
         {headCells.map((headCell) => (
           <TableCell
@@ -150,7 +148,7 @@ const EnhancedTableToolbar = (props) => {
       >
         Lista tytułów
       </Typography>
-     
+
       <Tooltip title="Filter list">
         <IconButton aria-label="filter list">
           <FilterListIcon />
@@ -170,6 +168,10 @@ const useStyles = makeStyles((theme) => ({
   },
   table: {
     minWidth: 750,
+   
+  },
+  row: {
+    cursor: "pointer"
   },
   visuallyHidden: {
     border: 0,
@@ -196,7 +198,6 @@ export default function EnhancedTable() {
   const dispatch = useDispatch();
   const searchedItem = useSelector((state) => state.searchInputValue);
   const data = useSelector((state) => state.setData);
-  const [csv, setCsv] = useState()
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
@@ -211,7 +212,7 @@ export default function EnhancedTable() {
         snapshot.forEach((doc) => {
           t = [...t, { ...doc.data(), id: doc.id }];
         });
-        setRows(t);     
+        setRows(t);
         dispatch({
           type: "SET_DATA",
           data: t,
@@ -281,6 +282,7 @@ export default function EnhancedTable() {
                   const labelId = `enhanced-table-checkbox-${index}`;
                   return (
                     <TableRow
+                      className={classes.row}
                       hover
                       onClick={(event) => handleClick(event, row.name)}
                       role="checkbox"
@@ -309,7 +311,7 @@ export default function EnhancedTable() {
                   );
                 })}
               {emptyRows > 0 && (
-                <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
+                <TableRow style={{ height: (dense ? 33 : 53) * emptyRows}}>
                   <TableCell colSpan={6} />
                 </TableRow>
               )}
@@ -330,7 +332,6 @@ export default function EnhancedTable() {
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
       />
-       
     </div>
   );
 }

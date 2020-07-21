@@ -18,6 +18,7 @@ import * as Yup from "yup";
 import { auth } from "../config";
 import { Link } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import * as firebase from "firebase/app";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -43,6 +44,7 @@ export default function SignIn() {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
   const [isSubmitionCompleted, setSubmitionCompleted] = useState(false);
+  const [remember, setRemember] = useState(false);
 
   return (
     <React.Fragment>
@@ -71,9 +73,20 @@ export default function SignIn() {
                     .catch(function (error) {
                       console.error(error.code, error.message);
                       resetForm();
-                      enqueueSnackbar("Błąd logowania. Nieprawidłowy email lub hasło.", { variant: "error" })
+                      enqueueSnackbar(
+                        "Błąd logowania. Nieprawidłowy email lub hasło.",
+                        { variant: "error" }
+                      );
                       setSubmitting(false);
                     });
+
+                  if (!remember) {
+                    auth
+                      .setPersistence(firebase.auth.Auth.Persistence.SESSION)
+                      .catch(function (error) {
+                        console.log(error);
+                      });
+                  }
                 }}
                 validationSchema={Yup.object().shape({
                   email: Yup.string()
@@ -135,7 +148,9 @@ export default function SignIn() {
                           <Checkbox
                             value="remember"
                             color="primary"
-                            onChange={(e) => console.log(e.currentTarget.value)}
+                            onChange={(e) =>
+                              setRemember(e.currentTarget.checked)
+                            }
                           />
                         }
                         label="Zapamiętaj mnie"

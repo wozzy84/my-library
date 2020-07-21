@@ -127,15 +127,7 @@ function uploadIsRunning(state = false, action) {
   }
 }
 
-function getCsv(state = "", action) {
-  switch (action.type) {
-    case "SET_CSV":
-      return action.csv;
 
-    default:
-      return state;
-  }
-}
 
 export {
   userReducer,
@@ -151,5 +143,4 @@ export {
   setData,
   searchInputValue,
   uploadIsRunning,
-  getCsv
 };
