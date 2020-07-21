@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { fade } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
-import {useDispatch} from 'react-redux'
+import { useDispatch } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   search: {
@@ -46,9 +46,9 @@ const useStyles = makeStyles((theme) => ({
       "&:focus": {
         width: "50ch",
       },
-      color: 'white'
-    }
-},
+      color: "white",
+    },
+  },
 
   popupIndicator: {
     display: "none",
@@ -58,33 +58,48 @@ const useStyles = makeStyles((theme) => ({
   },
   searchInput: {
     paddingLeft: 30,
-  }
-  }));
+  },
+}));
 
 export default function Search() {
-    const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const classes = useStyles();
   const [inputValue, setInputValue] = React.useState("");
   const [value, setValue] = React.useState(null);
   const [blur, setBlur] = useState(true);
   const data = useSelector((state) => state.setData);
-  
 
+  const [searchBase, setSearchbase] = useState();
 
+  useEffect(() => {
+    if (data.length) {
+      let modifiedData = [];
+      data.forEach((e) => {
+        modifiedData = [
+          ...modifiedData,
+          { ...e, search: e.title + ", " + e.author },
+        ];
+      });
+
+      setSearchbase(modifiedData);
+      console.log("TATA", modifiedData);
+    }
+  }, [data]);
 
   const defaultProps = {
-    options: data,
-    getOptionLabel: (option) => option.title,
+    options: searchBase,
+    getOptionLabel: (option) => option.search,
   };
 
   const handleSubmit = (e) => {
-      e.preventDefault();
-      dispatch({
-          type: "SEARCH_INPUT_VALUE",
-          value: data.filter((el)=> el.title.includes(inputValue))
-      })
-   
-  }
+    e.preventDefault();
+    dispatch({
+      type: "SEARCH_INPUT_VALUE",
+      value: searchBase.filter((el) =>
+        el.search.toLowerCase().includes(inputValue.toLocaleLowerCase())
+      ),
+    });
+  };
 
   return (
     <div className={classes.search}>
